@@ -30,3 +30,10 @@ docker run --runtime nvidia --gpus all \
     --quantization awq \
     --max-model-len 18000
 ```
+
+### Llama-cpp-agent local install
+
+```bash
+cd ../llama-cpp-agent
+pip install -e . -U
+```

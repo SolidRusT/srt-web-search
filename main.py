@@ -36,8 +36,8 @@ def respond(
 
     # provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
     # provider = TGIServerProvider("http://thanatos.hq.solidrust.net:8082")
-    # provider = TGIServerProvider("http://thanatos:8081")  # SRT HQ Internal
-    provider = VLLMServerProvider("http://thanatos:8081/v1",model=llm)  # SRT HQ Internal
+    provider = TGIServerProvider("http://thanatos:8081")  # SRT HQ Internal
+    #provider = VLLMServerProvider("http://thanatos:8081/v1",model=llm)  # SRT HQ Internal
 
     chat_template = get_messages_formatter_type(template)
 
@@ -49,12 +49,12 @@ def respond(
     )
 
     settings = provider.get_provider_default_settings()
+    settings.stream = False
     settings.temperature = temperature
     settings.top_k = top_k
     settings.top_p = top_p
     settings.max_tokens = max_tokens
     settings.repetition_penalty = repeat_penalty
-    settings.stream = True
     output_settings = LlmStructuredOutputSettings.from_functions(
         [search_web, write_message_to_user]
     )
@@ -90,19 +90,17 @@ def respond(
         role=Roles.tool,
         llm_sampling_settings=settings,
         chat_history=messages,
-        returns_streaming_generator=True,
+        returns_streaming_generator=False,
         print_output=False,
     )
-
     outputs = ""
-    for output in stream:
-        outputs += output
-        yield outputs
-
+    outputs += stream
+    yield outputs
+ 
     output_settings = LlmStructuredOutputSettings.from_pydantic_models(
         [CitingSources], LlmStructuredOutputType.object_instance
     )
-    settings.stream = False
+    
     citing_sources = agent.get_chat_response(
         "Please cite the sources you used in your response.",
         role=Roles.tool,

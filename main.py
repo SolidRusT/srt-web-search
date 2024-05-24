@@ -5,7 +5,7 @@ from messages import get_messages_formatter_type, write_message_to_user
 from search import search_web
 from llama_cpp import Llama
 from llama_cpp_agent import LlamaCppAgent
-from llama_cpp_agent.providers import LlamaCppPythonProvider
+from llama_cpp_agent.providers import TGIServerProvider
 from llama_cpp_agent.chat_history import BasicChatHistory
 from llama_cpp_agent.chat_history.messages import Roles
 from llama_cpp_agent.llm_output_settings import LlmStructuredOutputSettings
@@ -22,17 +22,18 @@ def respond(
         model,
 ):
     chat_template = get_messages_formatter_type(model)
-    model_selected = model
 
-    llm = Llama(
-        model_path=f"models/{model}",
-        flash_attn=True,
-        n_threads=40,
-        n_gpu_layers=81,
-        n_batch=1024,
-        n_ctx=get_context_by_model(model),
-    )
-    provider = LlamaCppPythonProvider(llm)
+    #llm = Llama(
+    #    model_path=f"models/{model}",
+    #    flash_attn=True,
+    #    n_threads=40,
+    #    n_gpu_layers=81,
+    #    n_batch=1024,
+    #    n_ctx=get_context_by_model(model),
+    #)
+    #provider = LlamaCppPythonProvider(llm)
+    #provider = LlamaCppServerProvider("http://localhost:8080")
+    provider = TGIServerProvider("http://thanatos:8081")
 
     agent = LlamaCppAgent(
         provider,
@@ -110,13 +111,6 @@ main = gr.ChatInterface(
             value=1.1,
             step=0.1,
             label="Repetition penalty",
-        ),
-        gr.Dropdown([
-            'Mistral-7B-Instruct-v0.3-Q6_K.gguf',
-            'Meta-Llama-3-8B-Instruct-Q6_K.gguf'
-        ],
-            value="Mistral-7B-Instruct-v0.3-Q6_K.gguf",
-            label="Model"
         ),
     ],
     theme=gr.themes.Soft(

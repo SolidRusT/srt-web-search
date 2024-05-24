@@ -5,11 +5,7 @@ from content import css, PLACEHOLDER
 from messages import get_messages_formatter_type, write_message_to_user
 from search import search_web
 from llama_cpp_agent import LlamaCppAgent
-from llama_cpp_agent.providers import TGIServerProvider, LlamaCppServerProvider, VLLMServerProvider
-
-# for VLLMServerProvider depends:
-from openai import OpenAI
-
+from llama_cpp_agent.providers import VLLMServerProvider
 from llama_cpp_agent.chat_history import BasicChatHistory
 from llama_cpp_agent.chat_history.messages import Roles
 from llama_cpp_agent.llm_output_settings import (
@@ -19,7 +15,10 @@ from llama_cpp_agent.llm_output_settings import (
 
 server_port = int(os.environ.get("PORT", 8650))
 server_name = os.environ.get("SERVER_NAME", "0.0.0.0")
-llm = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
+model = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
+base_url = "http://thanatos:8081/v1"
+max_tokens = 16384
+system_message = "You are a helpful assistant. Use additional available information you have access to when giving a response. Always give detailed and long responses. Format your response, well structured in markdown format."
 
 def respond(
     message,
@@ -29,7 +28,7 @@ def respond(
     temperature,
     top_p,
     top_k,
-    repeat_penalty,
+    repetition_penalty,
     model,
 ):
     template = "Mistral"
@@ -37,7 +36,7 @@ def respond(
     # provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
     #provider = TGIServerProvider("http://thanatos.hq.solidrust.net:8082")
     #provider = TGIServerProvider("http://thanatos:8081")  # SRT HQ Internal
-    provider = VLLMServerProvider("http://thanatos:8081/v1",model=llm)  # SRT HQ Internal
+    provider = VLLMServerProvider(base_url=base_url,model=model)  # SRT HQ Internal
 
     chat_template = get_messages_formatter_type(template)
 
@@ -54,7 +53,7 @@ def respond(
     settings.top_k = top_k
     settings.top_p = top_p
     settings.max_tokens = 1024
-    settings.repetition_penalty = repeat_penalty
+    settings.repetition_penalty = repetition_penalty
     output_settings = LlmStructuredOutputSettings.from_functions(
         [search_web, write_message_to_user]
     )
@@ -120,7 +119,7 @@ main = gr.ChatInterface(
     respond,
     additional_inputs=[
         gr.Textbox(
-            value="You are a helpful assistant. Use additional available information you have access to when giving a response. Always give detailed and long responses. Format your response, well structured in markdown format.",
+            value=system_message,
             label="System message",
         ),
         gr.Slider(minimum=1, maximum=4096, value=2048, step=1, label="Max tokens"),

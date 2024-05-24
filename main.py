@@ -36,8 +36,8 @@ def respond(
 
     # provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
     # provider = TGIServerProvider("http://thanatos.hq.solidrust.net:8082")
-    provider = TGIServerProvider("http://thanatos:8081")  # SRT HQ Internal
-    #provider = VLLMServerProvider("http://thanatos:8081/v1",model=llm)  # SRT HQ Internal
+    #provider = TGIServerProvider("http://thanatos:8081")  # SRT HQ Internal
+    provider = VLLMServerProvider("http://thanatos:8082/v1",model=llm)  # SRT HQ Internal
 
     chat_template = get_messages_formatter_type(template)
 
@@ -53,7 +53,7 @@ def respond(
     settings.temperature = temperature
     settings.top_k = top_k
     settings.top_p = top_p
-    settings.max_tokens = max_tokens
+    settings.max_tokens = 1024
     settings.repetition_penalty = repeat_penalty
     output_settings = LlmStructuredOutputSettings.from_functions(
         [search_web, write_message_to_user]
@@ -80,6 +80,7 @@ def respond(
             result = agent.get_chat_response(
                 result[0]["return_value"],
                 role=Roles.tool,
+                llm_sampling_settings=settings,
                 chat_history=messages,
                 structured_output_settings=output_settings,
                 print_output=False,

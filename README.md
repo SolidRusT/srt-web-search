@@ -13,6 +13,7 @@ example: "How many NBA championship wins do the Chicago Bulls hold?"
 ### vLLM NVIDIA
 
 ```bash
+# https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html
 #model="mistralai/Mistral-7B-instruct-v0.3"
 model="solidrust/Mistral-7B-instruct-v0.3-AWQ"
 docker run --runtime nvidia --gpus all \

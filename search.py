@@ -16,4 +16,4 @@ def search_web(search_query: str):
             result_string += web_info
 
     res = result_string.strip()
-    return "Based on the following results, answer the previous user query:\nResults:\n\n" + res[:10000]
+    return "Based on the following results, answer the previous user query:\nResults:\n\n" + res[:16384]

@@ -27,8 +27,10 @@ docker run --runtime nvidia --gpus all \
     --dtype auto \
     --device auto \
     --engine-use-ray \
+    --tensor-parallel-size 2 \
+    --gpu-memory-utilization 0.90 \
     --quantization awq \
-    --max-model-len 18000
+    --max-model-len 30000
 ```
 
 ### Llama-cpp-agent local install

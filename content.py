@@ -19,7 +19,7 @@ css = """
 PLACEHOLDER = """
 <div class="message-bubble-border" style="display:flex; max-width: 600px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); backdrop-filter: blur(10px);">
     <figure style="margin: 0;">
-        <img src="https://huggingface.co/spaces/poscye/ddg-web-search-chat/resolve/main/logo.jpg" alt="Logo" style="width: 100%; height: 100%; border-radius: 8px;">
+        <img src="https://github.com/SolidRusT/srt-web-search/blob/cc40288339d83e0b37d90bef1698926a42d9f228/logo.jpg" alt="Logo" style="width: 100%; height: 100%; border-radius: 8px;">
     </figure>
     <div style="padding: .5rem 1.5rem;">
         <h2 style="text-align: left; font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">llama-cpp-agent</h2>

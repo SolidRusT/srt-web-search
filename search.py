@@ -1,6 +1,7 @@
 from duckduckgo_search import DDGS
 from utils import get_website_content_from_url
 
+
 def search_web(search_query: str):
     """
     Search the web for information.
@@ -15,4 +16,4 @@ def search_web(search_query: str):
             result_string += web_info
 
     res = result_string.strip()
-    return "Based on the following results, Summarize and answer the previous user query:\nResults:\n\n" + res[:8192]
+    return "Based on the following results, answer the previous user query:\nResults:\n\n" + res

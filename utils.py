@@ -1,4 +1,7 @@
 import json
+from typing import List
+
+from pydantic import BaseModel, Field
 from trafilatura import fetch_url, extract
 
 def get_website_content_from_url(url: str) -> str:
@@ -22,3 +25,13 @@ def get_website_content_from_url(url: str) -> str:
             return ""
     except Exception as e:
         return f"An error occurred: {str(e)}"
+
+
+
+class CitingSources(BaseModel):
+    """
+    This represents the citing of the sources you used to answer the user query.
+    """
+    sources: List[str] = Field(...,
+                               description="List of sources to cite. Should be an URL of the source. E.g. GitHub URL, Blogpost URL or Newsletter URL.")
+

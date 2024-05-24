@@ -1,31 +1,36 @@
 import os
+
+
 import gradio as gr
+
+from utils import CitingSources
 from content import css, PLACEHOLDER
 from messages import get_messages_formatter_type, write_message_to_user, send_message_to_user
 from search import search_web
 from llama_cpp_agent import LlamaCppAgent
-from llama_cpp_agent.providers import TGIServerProvider
+from llama_cpp_agent.providers import TGIServerProvider, LlamaCppServerProvider
 from llama_cpp_agent.chat_history import BasicChatHistory
 from llama_cpp_agent.chat_history.messages import Roles
-from llama_cpp_agent.llm_output_settings import LlmStructuredOutputSettings
+from llama_cpp_agent.llm_output_settings import LlmStructuredOutputSettings, LlmStructuredOutputType
 
 server_port = int(os.environ.get("PORT", 8650))
 server_name = os.environ.get("SERVER_NAME", "0.0.0.0")
 
+
 def respond(
-    message,
-    history: list[tuple[str, str]],
-    system_message,
-    max_tokens,
-    temperature,
-    top_p,
-    top_k,
-    repeat_penalty,
-    model,
+        message,
+        history: list[tuple[str, str]],
+        system_message,
+        max_tokens,
+        temperature,
+        top_p,
+        top_k,
+        repeat_penalty,
+        model,
 ):
     model = "Mistral"
-    provider = TGIServerProvider("http://thanatos:8081")
-    
+    provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
+
     chat_template = get_messages_formatter_type(model)
 
     agent = LlamaCppAgent(
@@ -43,7 +48,7 @@ def respond(
     settings.repeat_penalty = repeat_penalty
     settings.stream = True
     output_settings = LlmStructuredOutputSettings.from_functions(
-        [search_web, send_message_to_user]
+        [search_web, write_message_to_user]
     )
     messages = BasicChatHistory()
 
@@ -60,7 +65,7 @@ def respond(
         print_output=False,
     )
     while True:
-        if result[0]["function"] == "send_message_to_user":
+        if result[0]["function"] == "write_message_to_user":
             break
         else:
             result = agent.get_chat_response(
@@ -85,12 +90,26 @@ def respond(
         outputs += output
         yield outputs
 
+    output_settings = LlmStructuredOutputSettings.from_pydantic_models([CitingSources], LlmStructuredOutputType.object_instance)
+    settings.stream = False
+    citing_sources = agent.get_chat_response(
+        "Please cite the sources you used in your response.",
+        role=Roles.tool,
+        llm_sampling_settings=settings,
+        chat_history=messages,
+        returns_streaming_generator=False,
+        structured_output_settings=output_settings,
+        print_output=False,
+    )
+    outputs += "\n\nSources:\n"
+    outputs += '\n'.join(citing_sources.sources)
+    yield outputs
 
 main = gr.ChatInterface(
     respond,
     additional_inputs=[
         gr.Textbox(
-            value="You are an advanced AI agent for summarizing and answer search engine result.",
+            value="You are a helpful assistant. Use additional available information you have access to when giving a response. Always give detailed and long responses. Format your response, well structured in markdown format.",
             label="System message",
         ),
         gr.Slider(minimum=1, maximum=4096, value=2048, step=1, label="Max tokens"),

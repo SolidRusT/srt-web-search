@@ -2,3 +2,4 @@ llama_cpp_agent>=0.2.10
 scikit-build-core
 duckduckgo_search
 trafilatura
+gradio>=4.31.5

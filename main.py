@@ -53,7 +53,7 @@ def respond(
     settings.top_k = top_k
     settings.top_p = top_p
     settings.max_tokens = max_tokens
-    settings.repeat_penalty = repeat_penalty
+    settings.repetition_penalty = repeat_penalty
     settings.stream = True
     output_settings = LlmStructuredOutputSettings.from_functions(
         [search_web, write_message_to_user]
@@ -73,6 +73,7 @@ def respond(
         print_output=False,
     )
     while True:
+        print(result)
         if result[0]["function"] == "write_message_to_user":
             break
         else:

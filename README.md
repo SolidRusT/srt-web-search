@@ -25,6 +25,8 @@ docker run --runtime nvidia --gpus all \
     --model $model --tokenizer $model \
     --trust-remote-code \
     --dtype auto \
+    --device auto \
+    --engine-use-ray \
     --quantization awq \
     --max-model-len 18000
 ```

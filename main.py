@@ -35,9 +35,9 @@ def respond(
     template = "Mistral"
 
     # provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
-    # provider = TGIServerProvider("http://thanatos.hq.solidrust.net:8082")
+    #provider = TGIServerProvider("http://thanatos.hq.solidrust.net:8082")
     #provider = TGIServerProvider("http://thanatos:8081")  # SRT HQ Internal
-    provider = VLLMServerProvider("http://thanatos:8082/v1",model=llm)  # SRT HQ Internal
+    provider = VLLMServerProvider("http://thanatos:8081/v1",model=llm)  # SRT HQ Internal
 
     chat_template = get_messages_formatter_type(template)
 

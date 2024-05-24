@@ -26,5 +26,4 @@ docker run --runtime nvidia --gpus all \
     --dtype auto \
     --quantization awq \
     --max-model-len 18000
-
 ```

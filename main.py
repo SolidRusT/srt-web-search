@@ -19,7 +19,7 @@ from llama_cpp_agent.llm_output_settings import (
 
 server_port = int(os.environ.get("PORT", 8650))
 server_name = os.environ.get("SERVER_NAME", "0.0.0.0")
-
+llm = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
 
 def respond(
     message,
@@ -32,14 +32,14 @@ def respond(
     repeat_penalty,
     model,
 ):
-    model = "Mistral"
+    template = "Mistral"
 
     # provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
     # provider = TGIServerProvider("http://thanatos.hq.solidrust.net:8082")
     # provider = TGIServerProvider("http://thanatos:8081")  # SRT HQ Internal
-    provider = VLLMServerProvider("http://thanatos:8081/v1/completions",model="solidrust/Mistral-7B-instruct-v0.3-AWQ")  # SRT HQ Internal
+    provider = VLLMServerProvider("http://thanatos:8081/v1",model=llm)  # SRT HQ Internal
 
-    chat_template = get_messages_formatter_type(model)
+    chat_template = get_messages_formatter_type(template)
 
     agent = LlamaCppAgent(
         provider,

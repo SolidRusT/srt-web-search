@@ -1,6 +1,5 @@
 from duckduckgo_search import DDGS
 from utils import get_website_content_from_url
-from model import model_selected, get_context_by_model
 
 def search_web(search_query: str):
     """
@@ -16,4 +15,4 @@ def search_web(search_query: str):
             result_string += web_info
 
     res = result_string.strip()
-    return "Based on the following results, Summarize and answer the previous user query:\nResults:\n\n" + res[:get_context_by_model(model_selected)]
+    return "Based on the following results, Summarize and answer the previous user query:\nResults:\n\n" + res[:8192]

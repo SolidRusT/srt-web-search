@@ -18,3 +18,11 @@ def write_message_to_user():
     Let you write a message to the user.
     """
     return "Please write the message to the user."
+
+def send_message_to_user(message: str):
+    """
+    Send a message to user.
+    Args:
+        message (str): Message to send.
+    """
+    print(message)

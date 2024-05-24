@@ -1,6 +1,7 @@
+import os
 import gradio as gr
 from content import css, PLACEHOLDER
-from messages import get_messages_formatter_type, write_message_to_user
+from messages import get_messages_formatter_type, write_message_to_user, send_message_to_user
 from search import search_web
 from llama_cpp_agent import LlamaCppAgent
 from llama_cpp_agent.providers import TGIServerProvider
@@ -8,6 +9,8 @@ from llama_cpp_agent.chat_history import BasicChatHistory
 from llama_cpp_agent.chat_history.messages import Roles
 from llama_cpp_agent.llm_output_settings import LlmStructuredOutputSettings
 
+server_port = int(os.environ.get("PORT", 8650))
+server_name = os.environ.get("SERVER_NAME", "0.0.0.0")
 
 def respond(
     message,
@@ -40,7 +43,7 @@ def respond(
     settings.repeat_penalty = repeat_penalty
     settings.stream = True
     output_settings = LlmStructuredOutputSettings.from_functions(
-        [search_web, write_message_to_user]
+        [search_web, send_message_to_user]
     )
     messages = BasicChatHistory()
 
@@ -57,7 +60,7 @@ def respond(
         print_output=False,
     )
     while True:
-        if result[0]["function"] == "write_message_to_user":
+        if result[0]["function"] == "send_message_to_user":
             break
         else:
             result = agent.get_chat_response(
@@ -140,4 +143,4 @@ main = gr.ChatInterface(
 )
 
 if __name__ == "__main__":
-    main.launch()
+    main.launch(server_name=server_name, server_port=server_port)

@@ -1,9 +1,7 @@
 import gradio as gr
 from content import css, PLACEHOLDER
-from model import model_selected, get_context_by_model
 from messages import get_messages_formatter_type, write_message_to_user
 from search import search_web
-from llama_cpp import Llama
 from llama_cpp_agent import LlamaCppAgent
 from llama_cpp_agent.providers import TGIServerProvider
 from llama_cpp_agent.chat_history import BasicChatHistory
@@ -23,16 +21,6 @@ def respond(
 ):
     chat_template = get_messages_formatter_type(model)
 
-    #llm = Llama(
-    #    model_path=f"models/{model}",
-    #    flash_attn=True,
-    #    n_threads=40,
-    #    n_gpu_layers=81,
-    #    n_batch=1024,
-    #    n_ctx=get_context_by_model(model),
-    #)
-    #provider = LlamaCppPythonProvider(llm)
-    #provider = LlamaCppServerProvider("http://localhost:8080")
     provider = TGIServerProvider("http://thanatos:8081")
 
     agent = LlamaCppAgent(

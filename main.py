@@ -5,7 +5,11 @@ from content import css, PLACEHOLDER
 from messages import get_messages_formatter_type, write_message_to_user
 from search import search_web
 from llama_cpp_agent import LlamaCppAgent
-from llama_cpp_agent.providers import TGIServerProvider, LlamaCppServerProvider
+from llama_cpp_agent.providers import TGIServerProvider, LlamaCppServerProvider, VLLMServerProvider
+
+# for VLLMServerProvider depends:
+from openai import OpenAI
+
 from llama_cpp_agent.chat_history import BasicChatHistory
 from llama_cpp_agent.chat_history.messages import Roles
 from llama_cpp_agent.llm_output_settings import (
@@ -32,7 +36,8 @@ def respond(
 
     # provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
     # provider = TGIServerProvider("http://thanatos.hq.solidrust.net:8082")
-    provider = TGIServerProvider("http://thanatos:8081")  # SRT HQ Internal
+    # provider = TGIServerProvider("http://thanatos:8081")  # SRT HQ Internal
+    provider = VLLMServerProvider("http://thanatos:8081/v1/completions",model="solidrust/Mistral-7B-instruct-v0.3-AWQ")  # SRT HQ Internal
 
     chat_template = get_messages_formatter_type(model)
 

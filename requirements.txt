@@ -3,3 +3,5 @@ scikit-build-core
 duckduckgo_search
 trafilatura
 gradio>=4.31.5
+# for VLLMServerProvider:
+openai

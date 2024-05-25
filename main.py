@@ -1,17 +1,31 @@
+import logging
 import gradio as gr
 from utils import CitingSources
 from content import css, PLACEHOLDER
-from messages import get_messages_formatter_type, write_message_to_user
-from config import provider, llm_model_type, llm_max_tokens, server_name, server_port, chat_examples
-from search import search_web
+from messages import MessageHandler
+from config import config
+from search import WebSearchTool, send_message_to_user
 from llama_cpp_agent import LlamaCppAgent
-
 from llama_cpp_agent.chat_history import BasicChatHistory
 from llama_cpp_agent.chat_history.messages import Roles
 from llama_cpp_agent.llm_output_settings import (
     LlmStructuredOutputSettings,
     LlmStructuredOutputType,
 )
+
+# Ensure configurations are loaded before accessing them in global scope
+provider = config.current_settings[1]
+llm_model_type = config.current_settings[0]["model_type"]
+llm_max_tokens = config.current_settings[0]["max_tokens"]
+server_name = config.server_name
+server_port = config.server_port
+chat_examples = config.chat_examples
+
+# Log startup information
+logging.info(f"Starting server at {server_name}:{server_port}")
+logging.info(f"Using model type: {llm_model_type} with max tokens: {llm_max_tokens}")
+logging.info(f"Loaded chat examples: {chat_examples}")
+
 
 def respond(
     message,
@@ -23,10 +37,9 @@ def respond(
     top_k,
     repetition_penalty,
     model,
-):  
-    # provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
-
-    chat_template = get_messages_formatter_type(llm_model_type)
+):
+    chat_template = MessageHandler.get_messages_formatter_type(llm_model_type)
+    search_tool = WebSearchTool(provider, chat_template)
 
     agent = LlamaCppAgent(
         provider,
@@ -43,8 +56,9 @@ def respond(
     settings.max_tokens = llm_max_tokens
     settings.repetition_penalty = repetition_penalty
     output_settings = LlmStructuredOutputSettings.from_functions(
-        [search_web, write_message_to_user]
+        [search_tool.get_tool(), send_message_to_user]
     )
+
     messages = BasicChatHistory()
 
     for msn in history:
@@ -60,8 +74,8 @@ def respond(
         print_output=False,
     )
     while True:
-        print(result)
-        if result[0]["function"] == "write_message_to_user":
+        logging.info(f"Response: {result}")
+        if result[0]["function"] == MessageHandler.write_message_to_user:
             break
         else:
             result = agent.get_chat_response(
@@ -84,11 +98,11 @@ def respond(
     outputs = ""
     outputs += stream
     yield outputs
- 
+
     output_settings = LlmStructuredOutputSettings.from_pydantic_models(
         [CitingSources], LlmStructuredOutputType.object_instance
     )
-    
+
     citing_sources = agent.get_chat_response(
         "Cite the sources you used in your response.",
         role=Roles.tool,
@@ -156,7 +170,7 @@ main = gr.ChatInterface(
     undo_btn="Undo",
     clear_btn="Clear",
     submit_btn="Send",
-    examples = (chat_examples),
+    examples=(chat_examples),
     analytics_enabled=False,
     description="Llama-cpp-agent: Chat Web Search Agent",
     chatbot=gr.Chatbot(scale=1, placeholder=PLACEHOLDER),

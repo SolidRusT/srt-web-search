@@ -64,12 +64,12 @@ elif backend_config == "vllm":
     current_settings = vllm_settings
     from llama_cpp_agent.providers import VLLMServerProvider
     provider = VLLMServerProvider(base_url=current_settings['url'], model=current_settings['model'])
-elif backend_config == "vllm":
+elif backend_config == "llama_cpp_server":
     current_settings = llama_cpp_server_settings
     from llama_cpp_agent.providers import LlamaCppServerProvider
     provider = LlamaCppServerProvider(base_url=current_settings['url'], model=current_settings['model'])
 else:
-    raise ValueError("Invalid backend_config. It should be either 'tgi' or 'vllm' or 'llama_cpp_agent'.")
+    raise ValueError("Invalid backend_config. It should be either 'tgi' or 'vllm' or 'llama_cpp_server'.")
 
 # Use the YAML settings
 llm_model = current_settings['model']

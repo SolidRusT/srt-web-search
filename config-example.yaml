@@ -21,6 +21,13 @@ vllm_default_urls:
     url: 'http://thanatos.hq.solidrust.net:8082/v1'
     server: 'Thanatos'
     max_tokens: 16384
+llama_cpp_server_default_urls:
+  - name: 'Mistral Instruct'
+    type: Mistral
+    model: 'bartowski/Mistral-7B-Instruct-v0.3-GGUF'
+    url: 'http://hades.hq.solidrust.net:8084'
+    server: 'hades'
+    max_tokens: 16384
 personas:
   # Assistants (gradio)
   Default:

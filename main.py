@@ -83,7 +83,7 @@ def respond(
         logging.info(f"Response: {result}")
         if result[0]['return_value']:
             outputs += result[0]['return_value']
-        if result[0]["function"] == MessageHandler.write_message_to_user:
+        if result[0]["function"] == "MessageHandler.write_message_to_user":
             break
         else:
             result = agent.get_chat_response(

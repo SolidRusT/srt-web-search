@@ -9,7 +9,7 @@ use_huggingface: True
 logs_path: 'logs'
 tgi_default_urls:
   - name: 'Dolphin Mistral'
-    type: dolphin
+    type: ChatML
     url: 'http://erebus.hq.solidrust.net:8081/'
     server: 'Erebus'
     max_tokens: 4096

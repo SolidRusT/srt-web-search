@@ -1,9 +1,8 @@
-import time
 import gradio as gr
-from utils import CitingSources
+from utils import CitingSources, current_timestamp
 from content import css, PLACEHOLDER
 from messages import get_messages_formatter_type, write_message_to_user
-from config import llm_url, llm_model, llm_max_tokens, server_name, server_port, chat_examples
+from config import llm_url, llm_model, llm_model_type, llm_max_tokens, server_name, server_port, chat_examples
 from search import search_web
 from llama_cpp_agent import LlamaCppAgent
 from llama_cpp_agent.providers import TGIServerProvider, LlamaCppServerProvider, VLLMServerProvider
@@ -13,9 +12,6 @@ from llama_cpp_agent.llm_output_settings import (
     LlmStructuredOutputSettings,
     LlmStructuredOutputType,
 )
-
-def current_timestamp():
-    return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
 
 def respond(
     message,
@@ -28,13 +24,11 @@ def respond(
     repetition_penalty,
     model,
 ):
-    template = "Mistral"
-    #template = "ChatML"
+    timestamp = current_timestamp()
+    template = llm_model_type
 
     # provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
-    #provider = TGIServerProvider("http://erebus.hq.solidrust.net:8081")   # Dolphin-2.6-mistal-7b
-    #provider = TGIServerProvider("http://thanatos.hq.solidrust.net:8082") # Mistral-7b-Instruct-v0.3
-    #provider = VLLMServerProvider("http://thanatos.hq.solidrust.net:8082/v1", model="solidrust/Mistral-7B-instruct-v0.3-AWQ")Mistral-7B-instruct-v0.3-AWQ
+ 
     #provider = TGIServerProvider(server_address=llm_url)
     provider = VLLMServerProvider(base_url=llm_url,model=llm_model)
 

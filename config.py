@@ -24,9 +24,11 @@ tgi_selected_url = tgi_default_url["url"]
 vllm_default_url = random.choice(config["vllm_default_urls"])
 vllm_selected_url = vllm_default_url["url"]
 vllm_selected_model = vllm_default_url["model"]
+vllm_selected_model_type = vllm_default_url["type"]
 vllm_max_tokens = vllm_default_url["max_tokens"]
 
 llm_model = vllm_selected_model
+llm_model_type = vllm_selected_model_type
 llm_url = vllm_selected_url
 llm_max_tokens = vllm_max_tokens
 

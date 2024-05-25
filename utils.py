@@ -1,8 +1,12 @@
 import json
+import time
 from typing import List
 
 from pydantic import BaseModel, Field
 from trafilatura import fetch_url, extract
+
+def current_timestamp():
+    return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
 
 def get_website_content_from_url(url: str) -> str:
     """

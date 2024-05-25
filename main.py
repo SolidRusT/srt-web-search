@@ -52,7 +52,7 @@ def respond(
     settings.temperature = temperature
     settings.top_k = top_k
     settings.top_p = top_p
-    settings.max_tokens = 1024
+    settings.max_tokens = max_tokens
     settings.repetition_penalty = repetition_penalty
     output_settings = LlmStructuredOutputSettings.from_functions(
         [search_web, write_message_to_user]

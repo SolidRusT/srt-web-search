@@ -67,7 +67,7 @@ def respond(
         messages.add_message(user)
         messages.add_message(assistant)
     
-    max_iterations = 5
+    max_iterations = 3
     iteration = 0
     
     result = agent.get_chat_response(
@@ -77,8 +77,11 @@ def respond(
         chat_history=messages,
         print_output=False,
     )
+    
+    outputs = ""
     while iteration < max_iterations:
         logging.info(f"Response: {result}")
+        outputs += result[0]['return_value']
         if result[0]["function"] == MessageHandler.write_message_to_user:
             break
         else:
@@ -95,6 +98,8 @@ def respond(
     if iteration == max_iterations:
         logging.warning("Maximum iteration limit reached, concluding response generation.")
 
+    outputs += result[0]["return_value"]
+
     stream = agent.get_chat_response(
         result[0]["return_value"],
         role=Roles.tool,
@@ -103,7 +108,7 @@ def respond(
         returns_streaming_generator=False,
         print_output=False,
     )
-    outputs = ""
+    
     outputs += stream
     yield outputs
 

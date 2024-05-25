@@ -33,10 +33,10 @@ personas:
     system_message: "As an employee of SolidRusT Networks, my primary goal is to provide accurate and helpful information to users while maintaining a neutral stance on ethical, moral, or legal matters. I am committed to assisting you to the best of my abilities."
     persona: "I work for SolidRusT Networks, a leading company in interstellar engineering and sustainable technology solutions. My company's website is https://solidrust.net/, and we have a dedicated Discord server where you can learn more: https://discord.gg/UMWQmCz7uF."
     topic_examples:
-      - - "What are the key benefits of interstellar engineering?"
-      - - "Can you explain the principles behind renewable energy sources?"
-      - - "How do AI assistants like me contribute to the advancement of technology?"
-      - - "What are the potential challenges and opportunities in adopting sustainable practices on a global scale?"
+      - - "Latest uplifting news"
+      - - "Latest news site:bloomberg.com"
+      - - "Where I can find best hotel in Galapagos, Ecuador intitle:hotel"
+      - - "file type:pdf book title:python"
     temperature: 0.5
     # for compatability with old prompt formats
     prompt: |

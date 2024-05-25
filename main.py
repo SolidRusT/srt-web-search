@@ -56,7 +56,7 @@ def respond(
     settings.max_tokens = llm_max_tokens
     settings.repetition_penalty = repetition_penalty
     output_settings = LlmStructuredOutputSettings.from_functions(
-        [search_tool.get_tool(), MessageHandler.send_message_to_user]
+        [search_tool.get_tool(), MessageHandler.write_message_to_user]
     )
 
     messages = BasicChatHistory()
@@ -81,7 +81,8 @@ def respond(
     outputs = ""
     while iteration < max_iterations:
         logging.info(f"Response: {result}")
-        outputs += result[0]['return_value']
+        if result[0]['return_value']:
+            outputs += result[0]['return_value']
         if result[0]["function"] == MessageHandler.write_message_to_user:
             break
         else:
@@ -98,7 +99,8 @@ def respond(
     if iteration == max_iterations:
         logging.warning("Maximum iteration limit reached, concluding response generation.")
 
-    outputs += result[0]["return_value"]
+    if result[0]['return_value']:
+        outputs += result[0]["return_value"]
 
     stream = agent.get_chat_response(
         result[0]["return_value"],

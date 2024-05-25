@@ -45,6 +45,7 @@ personas:
       - - "Latest news site:bloomberg.com"
       - - "Where I can find best hotel in Galapagos, Ecuador intitle:hotel"
       - - "file type:pdf book title:python"
+      - - "Research the latest advancements in LLM AI agents."
     temperature: 0.5
     # for compatability with old prompt formats
     prompt: |

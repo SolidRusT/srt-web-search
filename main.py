@@ -75,7 +75,7 @@ def respond(
     )
     while True:
         logging.info(f"Response: {result}")
-        if result[0]["function"] == MessageHandler.write_message_to_user:
+        if result[0]["function"] == "MessageHandler.write_message_to_user":
             break
         else:
             result = agent.get_chat_response(

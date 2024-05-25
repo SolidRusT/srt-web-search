@@ -21,6 +21,10 @@ server_port = int(os.environ.get("PORT", 8650))
 server_name = os.environ.get("SERVER_NAME", "0.0.0.0")
 llm = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
 max_tokens = 16384
+examples = [["Latest uplifting news"],
+    ["Latest news site:bloomberg.com"],
+    ["Where I can find best hotel in Galapagos, Ecuador intitle:hotel"],
+    ["file type:pdf book title:python"]]
 
 def respond(
     message,
@@ -169,6 +173,7 @@ main = gr.ChatInterface(
     undo_btn="Undo",
     clear_btn="Clear",
     submit_btn="Send",
+    examples = (examples),
     description="Llama-cpp-agent: Chat Web Search DDG Agent",
     chatbot=gr.Chatbot(scale=1, placeholder=PLACEHOLDER),
 )

@@ -24,12 +24,11 @@ def respond(
     repetition_penalty,
     model,
 ):
-    template = llm_model_type
     # provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
-     #provider = TGIServerProvider(server_address=llm_url)
+    #provider = TGIServerProvider(server_address=llm_url)
     provider = VLLMServerProvider(base_url=llm_url, model=llm_model)
 
-    chat_template = get_messages_formatter_type(template)
+    chat_template = get_messages_formatter_type(llm_model_type)
 
     agent = LlamaCppAgent(
         provider,

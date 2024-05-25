@@ -65,8 +65,8 @@ class Config:
             from llama_cpp_agent.providers import LlamaCppServerProvider
 
             return self.llama_cpp_server_settings, LlamaCppServerProvider(
-                base_url=self.llama_cpp_server_settings["url"],
-                model=self.llama_cpp_server_settings["model"],
+                server_address=self.llama_cpp_server_settings["url"],
+                llama_cpp_python_server=self.llama_cpp_server_settings[True],
             )
         else:
             raise ValueError(

@@ -18,6 +18,7 @@ huggingface-cli login --token $HF_TOKEN
 huggingface-cli whoami
 huggingface-cli download $model_repo $model_file
 # Run the llama CPP Server
+# not this one "pip install llama-cpp-python[server]"
 ./server -m $model_file -c 16384 -ngl 33 -b 1024 -t 6 --host 0.0.0.0 --port 8080 -np 2
 ```
 

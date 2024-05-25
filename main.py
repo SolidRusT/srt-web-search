@@ -30,15 +30,19 @@ server_name = os.environ.get("SERVER_NAME", "0.0.0.0")
 tgi_urls = os.environ.get("TGI_URLS", "tgi_default_urls")
 vllm_urls = os.environ.get("VLLM_URLS", "vllm_default_urls")
 
-llm = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
-max_tokens = 16384
-
 # From the config.yml
 
 tgi_default_url = random.choice(config["tgi_default_urls"])
 tgi_selected_url = tgi_default_url["url"]
+
 vllm_default_url = random.choice(config["vllm_default_urls"])
 vllm_selected_url = vllm_default_url["url"]
+vllm_selected_model = vllm_default_url["model"]
+vllm_max_tokens = vllm_default_url["max_tokens"]
+
+llm_model = vllm_selected_model
+llm_url = vllm_selected_url
+llm_max_tokens = vllm_max_tokens
 
 ui_theme = config["personas"][persona_name]["theme"]
 persona_full_name = config["personas"][persona_name]["name"]
@@ -81,15 +85,15 @@ def respond(
     repetition_penalty,
     model,
 ):
-    #template = "Mistral"
-    template = "ChatML"
+    template = "Mistral"
+    #template = "ChatML"
 
     # provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
     #provider = TGIServerProvider("http://erebus.hq.solidrust.net:8081")   # Dolphin-2.6-mistal-7b
     #provider = TGIServerProvider("http://thanatos.hq.solidrust.net:8082") # Mistral-7b-Instruct-v0.3
     #provider = VLLMServerProvider("http://thanatos.hq.solidrust.net:8082/v1", model="solidrust/Mistral-7B-instruct-v0.3-AWQ")Mistral-7B-instruct-v0.3-AWQ
-    #provider = TGIServerProvider(server_address=tgi_selected_url)
-    provider = VLLMServerProvider(base_url=vllm_selected_url,model=llm)
+    #provider = TGIServerProvider(server_address=llm_url)
+    provider = VLLMServerProvider(base_url=llm_url,model=llm_model)
 
     chat_template = get_messages_formatter_type(template)
 
@@ -105,7 +109,7 @@ def respond(
     settings.temperature = temperature
     settings.top_k = top_k
     settings.top_p = top_p
-    settings.max_tokens = 1024
+    settings.max_tokens = llm_max_tokens
     settings.repetition_penalty = repetition_penalty
     output_settings = LlmStructuredOutputSettings.from_functions(
         [search_web, write_message_to_user]
@@ -174,6 +178,7 @@ main = gr.ChatInterface(
         gr.Textbox(
             value="You are a helpful assistant. Use additional available information you have access to when giving a response. Always give detailed and long responses. Format your response, well structured in markdown format.",
             label="System message",
+            interactive=True,
         ),
         gr.Slider(minimum=1, maximum=4096, value=2048, step=1, label="Max tokens"),
         gr.Slider(minimum=0.1, maximum=4.0, value=0.7, step=0.1, label="Temperature"),
@@ -221,6 +226,7 @@ main = gr.ChatInterface(
     clear_btn="Clear",
     submit_btn="Send",
     examples = (examples),
+    analytics_enabled=False,
     description="Llama-cpp-agent: Chat Web Search Agent",
     chatbot=gr.Chatbot(scale=1, placeholder=PLACEHOLDER),
 )

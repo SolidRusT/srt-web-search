@@ -29,6 +29,11 @@ vllm_selected_model = vllm_default_url["model"]
 vllm_selected_model_type = vllm_default_url["type"]
 vllm_max_tokens = vllm_default_url["max_tokens"]
 
+#llm_model = tgi_selected_model
+#llm_model_type = tgi_selected_model_type
+#llm_url = tgi_selected_url
+#llm_max_tokens = tgi_max_tokens
+
 llm_model = vllm_selected_model
 llm_model_type = vllm_selected_model_type
 llm_url = vllm_selected_url

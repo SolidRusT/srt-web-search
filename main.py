@@ -1,5 +1,5 @@
 import gradio as gr
-from utils import CitingSources, current_timestamp
+from utils import CitingSources
 from content import css, PLACEHOLDER
 from messages import get_messages_formatter_type, write_message_to_user
 from config import llm_url, llm_model, llm_model_type, llm_max_tokens, server_name, server_port, chat_examples
@@ -24,13 +24,10 @@ def respond(
     repetition_penalty,
     model,
 ):
-    timestamp = current_timestamp()
     template = llm_model_type
-
     # provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
- 
-    #provider = TGIServerProvider(server_address=llm_url)
-    provider = VLLMServerProvider(base_url=llm_url,model=llm_model)
+     #provider = TGIServerProvider(server_address=llm_url)
+    provider = VLLMServerProvider(base_url=llm_url, model=llm_model)
 
     chat_template = get_messages_formatter_type(template)
 

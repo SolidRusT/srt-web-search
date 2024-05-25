@@ -1,5 +1,6 @@
 import logging
 import gradio as gr
+
 from utils import CitingSources
 from content import css, PLACEHOLDER
 from messages import MessageHandler
@@ -54,8 +55,8 @@ def respond(
     settings.temperature = temperature
     settings.top_k = top_k
     settings.top_p = top_p
-    settings.max_tokens = llm_max_tokens
-    settings.repetition_penalty = repetition_penalty
+    settings.n_predict = 1024
+    settings.repeat_penalty = repetition_penalty
     output_settings = LlmStructuredOutputSettings.from_functions(
         [search_tool.get_tool(), write_message_to_user]
     )
@@ -80,10 +81,8 @@ def respond(
     )
 
     outputs = ""
-    while iteration < max_iterations:
+    while True:
         logging.info(f"Response: {result}")
-        if result[0]["return_value"]:
-            outputs += result[0]["return_value"]
         if result[0]["function"] == "write_message_to_user":
             break
         else:
@@ -102,10 +101,7 @@ def respond(
             "Maximum iteration limit reached, concluding response generation."
         )
 
-    if result[0]["return_value"]:
-        outputs += result[0]["return_value"]
-
-    stream = agent.get_chat_response(
+    text = agent.get_chat_response(
         result[0]["return_value"],
         role=Roles.tool,
         llm_sampling_settings=settings,
@@ -114,24 +110,24 @@ def respond(
         print_output=False,
     )
 
-    outputs += stream
+    outputs += text
     yield outputs
 
-    output_settings = LlmStructuredOutputSettings.from_pydantic_models(
-        [CitingSources], LlmStructuredOutputType.object_instance
-    )
+    #output_settings = LlmStructuredOutputSettings.from_pydantic_models(
+    #    [CitingSources], LlmStructuredOutputType.object_instance
+    #)
 
-    citing_sources = agent.get_chat_response(
-        "Cite the sources you used in your response.",
-        role=Roles.tool,
-        llm_sampling_settings=settings,
-        chat_history=messages,
-        returns_streaming_generator=False,
-        structured_output_settings=output_settings,
-        print_output=False,
-    )
-    outputs += "\n\nSources:\n"
-    outputs += "\n".join(citing_sources.sources)
+    #citing_sources = agent.get_chat_response(
+    #    "Cite the sources you used in your response.",
+    #    role=Roles.tool,
+    #    llm_sampling_settings=settings,
+    #    chat_history=messages,
+    #    returns_streaming_generator=False,
+    #    structured_output_settings=output_settings,
+    #    print_output=False,
+    #)
+    #outputs += "\n\nSources:\n"
+    #outputs += "\n".join(citing_sources.sources)
     yield outputs
 
 

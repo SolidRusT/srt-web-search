@@ -4,7 +4,7 @@ from utils import CitingSources
 from content import css, PLACEHOLDER
 from messages import MessageHandler
 from config import config
-from search import WebSearchTool, send_message_to_user
+from search import WebSearchTool
 from llama_cpp_agent import LlamaCppAgent
 from llama_cpp_agent.chat_history import BasicChatHistory
 from llama_cpp_agent.chat_history.messages import Roles
@@ -56,7 +56,7 @@ def respond(
     settings.max_tokens = llm_max_tokens
     settings.repetition_penalty = repetition_penalty
     output_settings = LlmStructuredOutputSettings.from_functions(
-        [search_tool.get_tool(), send_message_to_user]
+        [search_tool.get_tool(), MessageHandler.send_message_to_user]
     )
 
     messages = BasicChatHistory()

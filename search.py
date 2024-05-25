@@ -108,34 +108,8 @@ class WebSearchTool:
         res = result_string.strip()
         return (
             "Based on the following results, answer the previous user query:\nResults:\n\n"
-            + res
+            + res # TODO: res[:16384]
         )
 
     def get_tool(self):
         return self.search_web
-
-
-def send_message_to_user(message: str):
-    """
-    Send a message to user.
-    Args:
-        message (str): Message to send.
-    """
-    print(message)
-
-
-# def search_web(search_query: str):
-#    """
-#    Search the web for information.
-#    Args:
-#        search_query (str): Search query to search for.
-#    """
-#    results = DDGS().text(search_query, region='wt-wt', safesearch='off', timelimit='y', max_results=3)
-#    result_string = ''
-#    for res in results:
-#        web_info = get_website_content_from_url(res['href'])
-#        if web_info != "":
-#            result_string += web_info
-#
-#    res = result_string.strip()
-#    return "Based on the following results, answer the previous user query:\nResults:\n\n" + res[:16384]

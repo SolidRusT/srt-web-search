@@ -1,4 +1,8 @@
 import os
+import yaml
+import random
+import time
+import logging
 import gradio as gr
 from utils import CitingSources
 from content import css, PLACEHOLDER
@@ -6,10 +10,6 @@ from messages import get_messages_formatter_type, write_message_to_user
 from search import search_web
 from llama_cpp_agent import LlamaCppAgent
 from llama_cpp_agent.providers import TGIServerProvider, LlamaCppServerProvider, VLLMServerProvider
-
-# for VLLMServerProvider depends:
-from openai import OpenAI
-
 from llama_cpp_agent.chat_history import BasicChatHistory
 from llama_cpp_agent.chat_history.messages import Roles
 from llama_cpp_agent.llm_output_settings import (
@@ -17,14 +17,58 @@ from llama_cpp_agent.llm_output_settings import (
     LlmStructuredOutputType,
 )
 
+# Load configuration
+with open("config.yaml", "r") as stream:
+    config = yaml.safe_load(stream)
+
+debug = False
+
+# From the environment variables
+persona_name = os.environ.get("PERSONA", "Default")
 server_port = int(os.environ.get("PORT", 8650))
 server_name = os.environ.get("SERVER_NAME", "0.0.0.0")
+tgi_urls = os.environ.get("TGI_URLS", "tgi_default_urls")
+vllm_urls = os.environ.get("VLLM_URLS", "vllm_default_urls")
+
 llm = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
 max_tokens = 16384
+
+# From the config.yml
+
+tgi_default_url = random.choice(config["tgi_default_urls"])
+tgi_selected_url = tgi_default_url["url"]
+vllm_default_url = random.choice(config["vllm_default_urls"])
+vllm_selected_url = vllm_default_url["url"]
+
+ui_theme = config["personas"][persona_name]["theme"]
+persona_full_name = config["personas"][persona_name]["name"]
+app_title = config["personas"][persona_name]["title"]
+persona_avatar_image = f"images/{config['personas'][persona_name]['avatar']}"
+description = config["personas"][persona_name]["description"]
+system_message = config["personas"][persona_name]["system_message"]
+persona = config["personas"][persona_name]["persona"]
+chat_examples = config["personas"][persona_name]["topic_examples"]
+temperature = config["personas"][persona_name]["temperature"]
+preferences = config["personas"][persona_name]["preferences"]
+
 examples = [["Latest uplifting news"],
     ["Latest news site:bloomberg.com"],
     ["Where I can find best hotel in Galapagos, Ecuador intitle:hotel"],
     ["file type:pdf book title:python"]]
+
+# Logging configuration
+log_level = logging.DEBUG if debug else logging.INFO
+logs_path = config["logs_path"]
+if not os.path.exists(logs_path):
+    os.makedirs(logs_path)
+logging.basicConfig(
+    filename=logs_path + "/client-chat-" + persona_full_name + ".log",
+    level=log_level,
+    format="%(asctime)s:%(levelname)s:%(message)s",
+)
+
+def current_timestamp():
+    return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
 
 def respond(
     message,
@@ -37,12 +81,15 @@ def respond(
     repetition_penalty,
     model,
 ):
-    template = "Mistral"
+    #template = "Mistral"
+    template = "ChatML"
 
     # provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
-    #provider = TGIServerProvider("http://thanatos.hq.solidrust.net:8082")
-    #provider = TGIServerProvider("http://thanatos:8081")  # SRT HQ Internal
-    provider = VLLMServerProvider("http://thanatos:8081/v1",model=llm)  # SRT HQ Internal
+    #provider = TGIServerProvider("http://erebus.hq.solidrust.net:8081")   # Dolphin-2.6-mistal-7b
+    #provider = TGIServerProvider("http://thanatos.hq.solidrust.net:8082") # Mistral-7b-Instruct-v0.3
+    #provider = VLLMServerProvider("http://thanatos.hq.solidrust.net:8082/v1", model="solidrust/Mistral-7B-instruct-v0.3-AWQ")Mistral-7B-instruct-v0.3-AWQ
+    #provider = TGIServerProvider(server_address=tgi_selected_url)
+    provider = VLLMServerProvider(base_url=vllm_selected_url,model=llm)
 
     chat_template = get_messages_formatter_type(template)
 
@@ -108,7 +155,7 @@ def respond(
     )
     
     citing_sources = agent.get_chat_response(
-        "Please cite the sources you used in your response.",
+        "Cite the sources you used in your response.",
         role=Roles.tool,
         llm_sampling_settings=settings,
         chat_history=messages,
@@ -174,7 +221,7 @@ main = gr.ChatInterface(
     clear_btn="Clear",
     submit_btn="Send",
     examples = (examples),
-    description="Llama-cpp-agent: Chat Web Search DDG Agent",
+    description="Llama-cpp-agent: Chat Web Search Agent",
     chatbot=gr.Chatbot(scale=1, placeholder=PLACEHOLDER),
 )
 

@@ -66,6 +66,10 @@ def respond(
         assistant = {"role": Roles.assistant, "content": msn[1]}
         messages.add_message(user)
         messages.add_message(assistant)
+    
+    max_iterations = 5
+    iteration = 0
+    
     result = agent.get_chat_response(
         message,
         llm_sampling_settings=settings,
@@ -73,9 +77,9 @@ def respond(
         chat_history=messages,
         print_output=False,
     )
-    while True:
+    while iteration < max_iterations:
         logging.info(f"Response: {result}")
-        if result[0]["function"] == "MessageHandler.write_message_to_user":
+        if result[0]["function"] == MessageHandler.write_message_to_user:
             break
         else:
             result = agent.get_chat_response(
@@ -86,6 +90,10 @@ def respond(
                 structured_output_settings=output_settings,
                 print_output=False,
             )
+        iteration += 1
+
+    if iteration == max_iterations:
+        logging.warning("Maximum iteration limit reached, concluding response generation.")
 
     stream = agent.get_chat_response(
         result[0]["return_value"],

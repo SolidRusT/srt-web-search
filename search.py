@@ -1,5 +1,6 @@
 import abc
 import json
+import logging
 from duckduckgo_search import DDGS
 from trafilatura import fetch_url, extract
 from llama_cpp_agent import LlamaCppAgent, MessagesFormatterType
@@ -32,7 +33,7 @@ class DDGWebSearchProvider(WebSearchProvider):
 class TrafilaturaWebCrawler(WebCrawler):
     def get_website_content_from_url(self, url: str) -> str:
         """
-        Get website content from a URL using Selenium and BeautifulSoup for improved content extraction and filtering.
+        Get website content from a URL using Trafilatura for improved content extraction and filtering.
 
         Args:
             url (str): URL to get website content from.
@@ -40,10 +41,8 @@ class TrafilaturaWebCrawler(WebCrawler):
         Returns:
             str: Extracted content including title, main text, and tables.
         """
-
         try:
             downloaded = fetch_url(url)
-
             result = extract(
                 downloaded,
                 include_formatting=True,
@@ -51,13 +50,13 @@ class TrafilaturaWebCrawler(WebCrawler):
                 output_format="json",
                 url=url,
             )
-
             if result:
                 result = json.loads(result)
                 return f'=========== Website Title: {result["title"]} ===========\n\n=========== Website URL: {url} ===========\n\n=========== Website Content ===========\n\n{result["raw_text"]}\n\n=========== Website Content End ===========\n\n'
             else:
                 return ""
         except Exception as e:
+            logging.error(f"Error extracting content from {url}: {e}")
             return f"An error occurred: {str(e)}"
 
 
@@ -108,7 +107,7 @@ class WebSearchTool:
         res = result_string.strip()
         return (
             "Based on the following results, answer the previous user query:\nResults:\n\n"
-            + res # TODO: res[:16384]
+            + res
         )
 
     def get_tool(self):

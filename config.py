@@ -17,9 +17,11 @@ tgi_urls = os.environ.get("TGI_URLS", "tgi_default_urls")
 vllm_urls = os.environ.get("VLLM_URLS", "vllm_default_urls")
 
 # From the config.yml
-
 tgi_default_url = random.choice(config["tgi_default_urls"])
 tgi_selected_url = tgi_default_url["url"]
+tgi_selected_model = tgi_default_url["model"]
+tgi_selected_model_type = tgi_default_url["type"]
+tgi_max_tokens = tgi_default_url["max_tokens"]
 
 vllm_default_url = random.choice(config["vllm_default_urls"])
 vllm_selected_url = vllm_default_url["url"]
@@ -42,11 +44,6 @@ persona = config["personas"][persona_name]["persona"]
 chat_examples = config["personas"][persona_name]["topic_examples"]
 temperature = config["personas"][persona_name]["temperature"]
 preferences = config["personas"][persona_name]["preferences"]
-
-examples = [["Latest uplifting news"],
-    ["Latest news site:bloomberg.com"],
-    ["Where I can find best hotel in Galapagos, Ecuador intitle:hotel"],
-    ["file type:pdf book title:python"]]
 
 # Logging configuration
 log_level = logging.DEBUG if debug else logging.INFO

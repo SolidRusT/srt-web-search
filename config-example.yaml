@@ -10,6 +10,7 @@ logs_path: 'logs'
 tgi_default_urls:
   - name: 'Dolphin Mistral'
     type: ChatML
+    model: 'solidrust/dolphin-2.6-mistral-7b-dpo-laser-AWQ'
     url: 'http://erebus.hq.solidrust.net:8081/'
     server: 'Erebus'
     max_tokens: 4096

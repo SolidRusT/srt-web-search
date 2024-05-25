@@ -40,6 +40,7 @@ def respond(
 ):
     chat_template = MessageHandler.get_messages_formatter_type(llm_model_type)
     search_tool = WebSearchTool(provider, chat_template)
+    write_message_to_user = MessageHandler.write_message_to_user
 
     agent = LlamaCppAgent(
         provider,
@@ -56,7 +57,7 @@ def respond(
     settings.max_tokens = llm_max_tokens
     settings.repetition_penalty = repetition_penalty
     output_settings = LlmStructuredOutputSettings.from_functions(
-        [search_tool.get_tool(), MessageHandler.write_message_to_user]
+        [search_tool.get_tool(), write_message_to_user]
     )
 
     messages = BasicChatHistory()
@@ -66,10 +67,10 @@ def respond(
         assistant = {"role": Roles.assistant, "content": msn[1]}
         messages.add_message(user)
         messages.add_message(assistant)
-    
+
     max_iterations = 3
     iteration = 0
-    
+
     result = agent.get_chat_response(
         message,
         llm_sampling_settings=settings,
@@ -77,13 +78,13 @@ def respond(
         chat_history=messages,
         print_output=False,
     )
-    
+
     outputs = ""
     while iteration < max_iterations:
         logging.info(f"Response: {result}")
-        if result[0]['return_value']:
-            outputs += result[0]['return_value']
-        if result[0]["function"] == "MessageHandler.write_message_to_user":
+        if result[0]["return_value"]:
+            outputs += result[0]["return_value"]
+        if result[0]["function"] == "write_message_to_user":
             break
         else:
             result = agent.get_chat_response(
@@ -97,9 +98,11 @@ def respond(
         iteration += 1
 
     if iteration == max_iterations:
-        logging.warning("Maximum iteration limit reached, concluding response generation.")
+        logging.warning(
+            "Maximum iteration limit reached, concluding response generation."
+        )
 
-    if result[0]['return_value']:
+    if result[0]["return_value"]:
         outputs += result[0]["return_value"]
 
     stream = agent.get_chat_response(
@@ -110,7 +113,7 @@ def respond(
         returns_streaming_generator=False,
         print_output=False,
     )
-    
+
     outputs += stream
     yield outputs
 

@@ -4,7 +4,7 @@ import logging
 from duckduckgo_search import DDGS
 from trafilatura import fetch_url, extract
 from llama_cpp_agent import LlamaCppAgent, MessagesFormatterType
-from llama_cpp_agent.providers.provider_base import LlmProvider
+from llama_cpp_agent.providers.provider_base import LlmProvider, LlmSamplingSettings, LlmProviderId
 
 
 class WebCrawler(abc.ABC):
@@ -63,11 +63,15 @@ class TrafilaturaWebCrawler(WebCrawler):
 class WebSearchTool:
 
     def __init__(
-        self,
-        llm_provider: LlmProvider,
-        message_formatter_type: MessagesFormatterType,
-        web_crawler: WebCrawler = None,
-        web_search_provider: WebSearchProvider = None,
+            self,
+            llm_provider: LlmProvider,
+            message_formatter_type: MessagesFormatterType,
+            web_crawler: WebCrawler = None,
+            web_search_provider: WebSearchProvider = None,
+            temperature: int = 0.45,
+            top_p: int = 0.95,
+            top_k: int = 40,
+            max_tokens_per_summary: int = 750
     ):
         self.summarising_agent = LlamaCppAgent(
             llm_provider,
@@ -85,6 +89,22 @@ class WebSearchTool:
         else:
             self.web_search_provider = web_search_provider
 
+        settings = llm_provider.get_provider_default_settings()
+        provider_id = llm_provider.get_provider_identifier()
+        settings.temperature = temperature
+        settings.top_p = top_p
+        settings.top_k = top_k
+
+        if provider_id == LlmProviderId.llama_cpp_server:
+            settings.n_predict = max_tokens_per_summary
+        elif provider_id == LlmProviderId.tgi_server:
+            settings.max_new_tokens = max_tokens_per_summary
+        else:
+            settings.max_tokens = max_tokens_per_summary
+
+        self.settings = settings
+
+
     def search_web(self, search_query: str):
         """
         Search the web for information.
@@ -101,13 +121,14 @@ class WebSearchTool:
                     + web_info,
                     add_response_to_chat_history=False,
                     add_message_to_chat_history=False,
+                    llm_sampling_settings=self.settings
                 )
                 result_string += web_info
 
         res = result_string.strip()
         return (
-            "Based on the following results, answer the previous user query:\nResults:\n\n"
-            + res
+                "Based on the following results, answer the previous user query:\nResults:\n\n"
+                + res
         )
 
     def get_tool(self):

@@ -13,8 +13,6 @@ debug = False
 persona_name = os.environ.get("PERSONA", "Default")
 server_port = int(os.environ.get("PORT", 8650))
 server_name = os.environ.get("SERVER_NAME", "0.0.0.0")
-tgi_urls = os.environ.get("TGI_URLS", "tgi_default_urls")
-vllm_urls = os.environ.get("VLLM_URLS", "vllm_default_urls")
 backend_config = os.environ.get("BACKEND_CONFIG", "vllm")
 
 # From the config.yml
@@ -30,6 +28,12 @@ vllm_selected_model = vllm_default_url["model"]
 vllm_selected_model_type = vllm_default_url["type"]
 vllm_max_tokens = vllm_default_url["max_tokens"]
 
+llama_cpp_server_default_url = random.choice(config["llama_cpp_server_default_urls"])
+llama_cpp_server_selected_url = llama_cpp_server_default_url["url"]
+llama_cpp_server_selected_model = llama_cpp_server_default_url["model"]
+llama_cpp_server_selected_model_type = llama_cpp_server_default_url["type"]
+llama_cpp_server_max_tokens = llama_cpp_server_default_url["max_tokens"]
+
 tgi_settings = {
     'model': tgi_selected_model,
     'model_type': tgi_selected_model_type,
@@ -43,8 +47,15 @@ vllm_settings = {
     'url': vllm_selected_url,
     'max_tokens': vllm_max_tokens
 }
+#
+llama_cpp_server_settings = {
+    'model': llama_cpp_server_selected_model,
+    'model_type': llama_cpp_server_selected_model_type,
+    'url': llama_cpp_server_selected_url,
+    'max_tokens': llama_cpp_server_max_tokens
+}
 
-# Toggle between the settings
+# Toggle between the backends
 if backend_config == "tgi":
     current_settings = tgi_settings
     from llama_cpp_agent.providers import TGIServerProvider
@@ -53,11 +64,14 @@ elif backend_config == "vllm":
     current_settings = vllm_settings
     from llama_cpp_agent.providers import VLLMServerProvider
     provider = VLLMServerProvider(base_url=current_settings['url'], model=current_settings['model'])
-# LlamaCppServerProvider
+elif backend_config == "vllm":
+    current_settings = llama_cpp_server_settings
+    from llama_cpp_agent.providers import LlamaCppServerProvider
+    provider = LlamaCppServerProvider(base_url=current_settings['url'], model=current_settings['model'])
 else:
-    raise ValueError("Invalid backend_config. It should be either 'tgi' or 'vllm'.")
+    raise ValueError("Invalid backend_config. It should be either 'tgi' or 'vllm' or 'llama_cpp_agent'.")
 
-# Use the settings
+# Use the YAML settings
 llm_model = current_settings['model']
 llm_model_type = current_settings['model_type']
 llm_url = current_settings['url']

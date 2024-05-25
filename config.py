@@ -15,6 +15,7 @@ server_port = int(os.environ.get("PORT", 8650))
 server_name = os.environ.get("SERVER_NAME", "0.0.0.0")
 tgi_urls = os.environ.get("TGI_URLS", "tgi_default_urls")
 vllm_urls = os.environ.get("VLLM_URLS", "vllm_default_urls")
+backend_config = os.environ.get("BACKEND_CONFIG", "vllm")
 
 # From the config.yml
 tgi_default_url = random.choice(config["tgi_default_urls"])
@@ -29,15 +30,38 @@ vllm_selected_model = vllm_default_url["model"]
 vllm_selected_model_type = vllm_default_url["type"]
 vllm_max_tokens = vllm_default_url["max_tokens"]
 
-#llm_model = tgi_selected_model
-#llm_model_type = tgi_selected_model_type
-#llm_url = tgi_selected_url
-#llm_max_tokens = tgi_max_tokens
+tgi_settings = {
+    'model': tgi_selected_model,
+    'model_type': tgi_selected_model_type,
+    'url': tgi_selected_url,
+    'max_tokens': tgi_max_tokens
+}
 
-llm_model = vllm_selected_model
-llm_model_type = vllm_selected_model_type
-llm_url = vllm_selected_url
-llm_max_tokens = vllm_max_tokens
+vllm_settings = {
+    'model': vllm_selected_model,
+    'model_type': vllm_selected_model_type,
+    'url': vllm_selected_url,
+    'max_tokens': vllm_max_tokens
+}
+
+# Toggle between the settings
+if backend_config == "tgi":
+    current_settings = tgi_settings
+    from llama_cpp_agent.providers import TGIServerProvider
+    provider = TGIServerProvider(server_address=current_settings['url'])
+elif backend_config == "vllm":
+    current_settings = vllm_settings
+    from llama_cpp_agent.providers import VLLMServerProvider
+    provider = VLLMServerProvider(base_url=current_settings['url'], model=current_settings['model'])
+# LlamaCppServerProvider
+else:
+    raise ValueError("Invalid backend_config. It should be either 'tgi' or 'vllm'.")
+
+# Use the settings
+llm_model = current_settings['model']
+llm_model_type = current_settings['model_type']
+llm_url = current_settings['url']
+llm_max_tokens = current_settings['max_tokens']
 
 ui_theme = config["personas"][persona_name]["theme"]
 persona_full_name = config["personas"][persona_name]["name"]

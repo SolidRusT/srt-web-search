@@ -9,20 +9,23 @@ example: "How many NBA championship wins do the Chicago Bulls hold?"
 ### llama-cpp-server
 
 ```bash
-pip install huggingface-hub
+#!/bin/bash
+model_file="Mistral-7B-Instruct-v0.3-Q4_K_M.gguf"
+model_repo="bartowski/Mistral-7B-Instruct-v0.3-GGUF"
+# Download the model
+pip install -U "huggingface_hub[cli]"
 huggingface-cli login --token $HF_TOKEN
-huggingface-cli download bartowski/Mistral-7B-Instruct-v0.3-GGUF
-./server -m mistral-7b-instruct-v0.3.Q4_K_M.gguf -c 16384 -ngl 33 -b 1024 -t 6 --host 0.0.0.0 --port 8080 -np 2
+huggingface-cli whoami
+huggingface-cli download $model_repo $model_file
+# Run the llama CPP Server
+./server -m $model_file -c 16384 -ngl 33 -b 1024 -t 6 --host 0.0.0.0 --port 8080 -np 2
 ```
 
 ### TGI NVIDIA
 
 ```bash
 #!/bin/bash
-# mosaicml/mpt-7b-instruct
-# bigscience/bloomz-7b1
-# tiiuae/falcon-7b-instruct
-# h2oai/h2ogpt-gm-oasst1-en-2048-falcon-7b-v3
+# model="solidrust/Mistral-7B-instruct-v0.3-AWQ"
 model=${MODEL}
 num_shard=${NUM_SHARD}
 volume="${HOME}/${HOSTNAME}-AI/text-generation" # share a volume

@@ -8,7 +8,15 @@ example: "How many NBA championship wins do the Chicago Bulls hold?"
 
 ### llama-cpp-server
 
+```bash
+./server -m mistral-7b-instruct-v0.3.Q4_K_M.gguf -c 16384 -ngl 33 -b 1024 -t 6 --host 0.0.0.0 --port 8080 -np 2
+```
+
 ### TGI NVIDIA
+
+```bash
+
+```
 
 ### vLLM NVIDIA
 

@@ -45,11 +45,16 @@ llm_max_tokens = config.current_settings[0]["max_tokens"]
 chat_examples = config.chat_examples
 
 # Log startup information
-logging.info(f"Starting server at {server_name}:{server_port} with model: {model}.")
 logging.info(
-    f"Using model type: {llm_model_type} with max tokens: {llm_max_tokens}, and with provider: {provider_identifier}."
+    f"""
+    server: {server_name}:{server_port},
+    model: {model},
+    model type: {llm_model_type},
+    max tokens: {llm_max_tokens}, 
+    provider: {provider_identifier},
+    Loaded chat examples: {chat_examples},
+    """
 )
-logging.info(f"Loaded chat examples: {chat_examples}")
 
 
 def respond(

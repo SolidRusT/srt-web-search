@@ -23,6 +23,7 @@ from llama_cpp_agent.providers import VLLMServerProvider, LlamaCppServerProvider
 #    "http://thanatos:8081/v1", "solidrust/Mistral-7B-instruct-v0.3-AWQ"
 #)
 provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
+#provider = LlamaCppServerProvider("http://hades:8084")
 
 llm_model_type = config.current_settings[0]["model_type"]
 llm_max_tokens = config.current_settings[0]["max_tokens"]
@@ -49,7 +50,7 @@ def respond(
 ):
     chat_template = MessageHandler.get_messages_formatter_type(llm_model_type)
 
-    print("<chat_template>", chat_template, "</chat_template>")
+    logging.info(f"Loaded chat examples: {chat_template}")
     search_tool = WebSearchTool(
         llm_provider=provider,
         message_formatter_type=chat_template,

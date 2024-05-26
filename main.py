@@ -69,9 +69,6 @@ def respond(
         messages.add_message(user)
         messages.add_message(assistant)
 
-    max_iterations = 3
-    iteration = 0
-
     result = agent.get_chat_response(
         message,
         llm_sampling_settings=settings,
@@ -94,24 +91,19 @@ def respond(
                 structured_output_settings=output_settings,
                 print_output=False,
             )
-        iteration += 1
-
-    if iteration == max_iterations:
-        logging.warning(
-            "Maximum iteration limit reached, concluding response generation."
-        )
-
-    text = agent.get_chat_response(
+    settings.stream = True
+    response_text = agent.get_chat_response(
         result[0]["return_value"],
         role=Roles.tool,
         llm_sampling_settings=settings,
         chat_history=messages,
-        returns_streaming_generator=False,
+        returns_streaming_generator=True,
         print_output=False,
     )
 
-    outputs += text
-    yield outputs
+    for text in response_text:
+        outputs += text
+        yield outputs
 
     #output_settings = LlmStructuredOutputSettings.from_pydantic_models(
     #    [CitingSources], LlmStructuredOutputType.object_instance
@@ -128,7 +120,7 @@ def respond(
     #)
     #outputs += "\n\nSources:\n"
     #outputs += "\n".join(citing_sources.sources)
-    yield outputs
+    # yield outputs
 
 
 main = gr.ChatInterface(

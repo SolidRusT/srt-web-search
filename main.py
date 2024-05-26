@@ -3,6 +3,7 @@ import logging
 import gradio as gr
 # Locals
 from config import config
+from llama_cpp_agent.providers import LlamaCppServerProvider
 from messages import MessageHandler
 from content import css, PLACEHOLDER
 from utils import CitingSources
@@ -16,7 +17,7 @@ from llama_cpp_agent.llm_output_settings import (
 )
 # Tools
 from llama_cpp_agent.tools import WebSearchTool
-from llama_cpp_agent.prompt_templates import web_search_system_prompt
+from llama_cpp_agent.prompt_templates import web_search_system_prompt, research_system_prompt
 
 # Ensure configurations are loaded before accessing them in global scope
 # provider = VLLMServerProvider(
@@ -24,17 +25,21 @@ from llama_cpp_agent.prompt_templates import web_search_system_prompt
 # )
 # provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
 # provider = LlamaCppServerProvider("http://hades:8084")
-provider = config.current_settings[1]
+provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
 print("Current provider:", provider)
-
+provider_identifier = provider.get_provider_identifier()
 # provider.get_provider_identifier()
 #    llama_cpp_server = "llama_cpp_server"
 #    llama_cpp_python = "llama_cpp_python"
 #    tgi_server = "text_generation_inference"
 #    vllm_server = "vllm"
-provider_identifier = provider.get_provider_identifier()
-
-model = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
+#provider = config.current_settings[1]
+model="solidrust/Mistral-7B-instruct-v0.3-AWQ"
+#provider = VLLMServerProvider(
+#    base_url="http://thanatos:8081/v1", model=model, #huggingface_model=model,
+#)
+# provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
+# provider = LlamaCppServerProvider("http://hades:8084")
 
 llm_model_type = config.current_settings[0]["model_type"]
 server_name = config.server_name
@@ -73,13 +78,19 @@ def respond(
         llm_provider=provider,
         message_formatter_type=chat_template,
         max_tokens_search_results=12000,
+        max_tokens_per_summary=2048,
     )
 
-    write_message_to_user = MessageHandler.write_message_to_user
-
-    agent = LlamaCppAgent(
+    web_search_agent = LlamaCppAgent(
         provider,
-        system_prompt=f"{system_message}",
+        system_prompt=web_search_system_prompt,
+        predefined_messages_formatter_type=chat_template,
+        debug_output=True,
+    )
+
+    answer_agent = LlamaCppAgent(
+        provider,
+        system_prompt=research_system_prompt,
         predefined_messages_formatter_type=chat_template,
         debug_output=True,
     )
@@ -90,14 +101,14 @@ def respond(
     settings.top_k = top_k
     settings.top_p = top_p
     ## vLLM Provider Settings
-    settings.max_tokens = max_tokens
-    settings.repetition_penalty = repetition_penalty
+    #settings.max_tokens = max_tokens
+    #settings.repetition_penalty = repetition_penalty
     ## CPPServer Settings
-    # settings.n_predict = max_tokens
-    # settings.repeat_penalty = repetition_penalty
+    settings.n_predict = max_tokens
+    settings.repeat_penalty = repetition_penalty
 
     output_settings = LlmStructuredOutputSettings.from_functions(
-        [search_tool.get_tool(), write_message_to_user]
+        [search_tool.get_tool()]
     )
 
     messages = BasicChatHistory()
@@ -108,31 +119,20 @@ def respond(
         messages.add_message(user)
         messages.add_message(assistant)
 
-    result = agent.get_chat_response(
+    result = web_search_agent.get_chat_response(
         message,
         llm_sampling_settings=settings,
         structured_output_settings=output_settings,
-        chat_history=messages,
+        add_message_to_chat_history=False,
+        add_response_to_chat_history=False,
         print_output=False,
     )
 
     outputs = ""
-    while True:
-        logging.info(f"Response: {result}")
-        if result[0]["function"] == "write_message_to_user":
-            break
-        else:
-            result = agent.get_chat_response(
-                result[0]["return_value"],
-                role=Roles.tool,
-                llm_sampling_settings=settings,
-                chat_history=messages,
-                structured_output_settings=output_settings,
-                print_output=False,
-            )
+
     settings.stream = True
-    response_text = agent.get_chat_response(
-        result[0]["return_value"],
+    response_text = answer_agent.get_chat_response(
+        f"Write a detailed and complete research document that fulfills the following user request: '{message}', based on the information from the web below.\n\n" + result[0]["return_value"],
         role=Roles.tool,
         llm_sampling_settings=settings,
         chat_history=messages,
@@ -148,7 +148,7 @@ def respond(
         [CitingSources], LlmStructuredOutputType.object_instance
     )
 
-    citing_sources = agent.get_chat_response(
+    citing_sources = answer_agent.get_chat_response(
         "Cite the sources you used in your response.",
         role=Roles.tool,
         llm_sampling_settings=settings,

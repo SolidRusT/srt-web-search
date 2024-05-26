@@ -15,7 +15,6 @@ from llama_cpp_agent.chat_history.messages import Roles
 from llama_cpp_agent.llm_output_settings import LlmStructuredOutputSettings, LlmStructuredOutputType
 
 # temp
-from llama_cpp_agent import MessagesFormatterType
 from llama_cpp_agent.providers import VLLMServerProvider, LlamaCppServerProvider
 
 # Ensure configurations are loaded before accessing them in global scope

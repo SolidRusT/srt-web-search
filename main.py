@@ -9,10 +9,7 @@ from search import WebSearchTool
 from llama_cpp_agent import LlamaCppAgent
 from llama_cpp_agent.chat_history import BasicChatHistory
 from llama_cpp_agent.chat_history.messages import Roles
-from llama_cpp_agent.llm_output_settings import (
-    LlmStructuredOutputSettings,
-    LlmStructuredOutputType,
-)
+from llama_cpp_agent.llm_output_settings import LlmStructuredOutputSettings
 
 # Ensure configurations are loaded before accessing them in global scope
 provider = config.current_settings[1]
@@ -55,8 +52,9 @@ def respond(
     settings.temperature = temperature
     settings.top_k = top_k
     settings.top_p = top_p
-    settings.n_predict = 1024
-    settings.repeat_penalty = repetition_penalty
+    #settings.n_predict = max_tokens
+    settings.max_tokens = max_tokens
+    settings.repetition_penalty = repetition_penalty
     output_settings = LlmStructuredOutputSettings.from_functions(
         [search_tool.get_tool(), write_message_to_user]
     )

@@ -4,7 +4,7 @@ import logging
 from duckduckgo_search import DDGS
 from trafilatura import fetch_url, extract
 from llama_cpp_agent import LlamaCppAgent, MessagesFormatterType
-from llama_cpp_agent.providers.provider_base import LlmProvider, LlmSamplingSettings, LlmProviderId
+from llama_cpp_agent.providers.provider_base import LlmProvider, LlmProviderId
 
 
 class WebCrawler(abc.ABC):

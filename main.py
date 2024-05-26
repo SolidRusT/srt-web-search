@@ -18,12 +18,17 @@ from llama_cpp_agent.llm_output_settings import LlmStructuredOutputSettings, Llm
 from llama_cpp_agent.providers import VLLMServerProvider, LlamaCppServerProvider
 
 # Ensure configurations are loaded before accessing them in global scope
+# provider.get_provider_identifier()
+#    llama_cpp_server = "llama_cpp_server"
+#    llama_cpp_python = "llama_cpp_python"
+#    tgi_server = "text_generation_inference"
+#    vllm_server = "vllm"
 # provider = config.current_settings[1]
-#provider = VLLMServerProvider(
-#    "http://thanatos:8081/v1", "solidrust/Mistral-7B-instruct-v0.3-AWQ"
-#)
+provider = VLLMServerProvider(
+    "http://thanatos:8081/v1", "solidrust/Mistral-7B-instruct-v0.3-AWQ"
+)
 #provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
-provider = LlamaCppServerProvider("http://hades:8084")
+#provider = LlamaCppServerProvider("http://hades:8084")
 
 llm_model_type = config.current_settings[0]["model_type"]
 llm_max_tokens = config.current_settings[0]["max_tokens"]
@@ -72,11 +77,11 @@ def respond(
     settings.top_k = top_k
     settings.top_p = top_p
     ## vLLM Provider Settings
-    # settings.max_tokens = max_tokens
-    # settings.repetition_penalty = repetition_penalty
+    settings.max_tokens = max_tokens
+    settings.repetition_penalty = repetition_penalty
     ## CPPServer Settings
-    settings.n_predict = max_tokens
-    settings.repeat_penalty = repetition_penalty
+    #settings.n_predict = max_tokens
+    #settings.repeat_penalty = repetition_penalty
     
     output_settings = LlmStructuredOutputSettings.from_functions(
         [search_tool.get_tool(), write_message_to_user]

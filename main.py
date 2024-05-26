@@ -1,6 +1,7 @@
 import logging
 import gradio as gr
 
+from llama_cpp_agent.prompt_templates import web_search_system_prompt
 from utils import CitingSources
 from content import css, PLACEHOLDER
 from messages import MessageHandler
@@ -54,7 +55,7 @@ def respond(
     search_tool = WebSearchTool(
         llm_provider=provider,
         message_formatter_type=chat_template,
-        max_tokens_search_results=32,
+        max_tokens_search_results=12000,
     )
 
     write_message_to_user = MessageHandler.write_message_to_user
@@ -144,7 +145,7 @@ main = gr.ChatInterface(
     respond,
     additional_inputs=[
         gr.Textbox(
-            value="You are a helpful assistant. Use additional available information you have access to when giving a response. Always give detailed and long responses. Format your response, well structured in markdown format.",
+            value=web_search_system_prompt,
             label="System message",
             interactive=True,
         ),

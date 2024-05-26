@@ -104,4 +104,11 @@ curl -f -X POST http://thanatos:8081/v1/completions \
 
 ```bash
 docker build -t solidrust/srt-web-search -f Dockerfile .
+docker run \
+  -v ~/.cache/huggingface:/root/.cache/huggingface \
+  --env "HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}" \
+  --env "OPENAI_API_KEY=${OPENAI_API_KEY}" \
+  -p 8650:8650 \
+  --ipc=host \
+  solidrust/srt-web-search
 ```

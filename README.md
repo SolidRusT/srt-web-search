@@ -88,3 +88,14 @@ docker run --runtime nvidia --gpus all \
 ```bash
 docker run --runtime nvidia --gpus all     -v ~/.cache/huggingface:/root/.cache/huggingface     --env "HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}"     -p 8081:8000     --ipc=host     vllm/vllm-openai:latest     --model solidrust/Mistral-7B-instruct-v0.3-AWQ --tokenizer solidrust/Mistral-7B-instruct-v0.3-AWQ --trust-remote-code --dtype auto --device auto --gpu-memory-utilization 0.98 --quantization awq  --max-model-len 28350
 ```
+
+```bash
+curl -f -X POST http://thanatos:8081/v1/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "solidrust/Mistral-7B-instruct-v0.3-AWQ",
+    "prompt": "Role: You are a creative and imaginative storywriter.\nInstruction: Write a simple and engaging poem about who kicked my dog.\nInput:",
+    "max_tokens": 512,
+    "temperature": 5
+  }'
+```

@@ -1,24 +1,22 @@
+# Defaults
 import logging
 import gradio as gr
-
-from llama_cpp_agent.prompt_templates import web_search_system_prompt
-from utils import CitingSources
-from content import css, PLACEHOLDER
-from messages import MessageHandler
+# Locals
 from config import config
-
-# from search import WebSearchTool
+from messages import MessageHandler
+from content import css, PLACEHOLDER
+from utils import CitingSources
+# Agents
 from llama_cpp_agent import LlamaCppAgent
-from llama_cpp_agent.tools import WebSearchTool
 from llama_cpp_agent.chat_history import BasicChatHistory
 from llama_cpp_agent.chat_history.messages import Roles
 from llama_cpp_agent.llm_output_settings import (
     LlmStructuredOutputSettings,
     LlmStructuredOutputType,
 )
-
-# temp
-from llama_cpp_agent.providers import VLLMServerProvider, LlamaCppServerProvider
+# Tools
+from llama_cpp_agent.tools import WebSearchTool
+from llama_cpp_agent.prompt_templates import web_search_system_prompt
 
 # Ensure configurations are loaded before accessing them in global scope
 # provider = VLLMServerProvider(
@@ -56,7 +54,7 @@ logging.info(
     """
 )
 
-
+## Run inference
 def respond(
     message,
     history: list[tuple[str, str]],
@@ -164,6 +162,7 @@ def respond(
     yield outputs
 
 
+# Begin Gradio UI
 main = gr.ChatInterface(
     respond,
     additional_inputs=[

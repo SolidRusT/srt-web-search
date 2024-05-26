@@ -12,7 +12,10 @@ from llama_cpp_agent import LlamaCppAgent
 from llama_cpp_agent.tools import WebSearchTool
 from llama_cpp_agent.chat_history import BasicChatHistory
 from llama_cpp_agent.chat_history.messages import Roles
-from llama_cpp_agent.llm_output_settings import LlmStructuredOutputSettings, LlmStructuredOutputType
+from llama_cpp_agent.llm_output_settings import (
+    LlmStructuredOutputSettings,
+    LlmStructuredOutputType,
+)
 
 # temp
 from llama_cpp_agent.providers import VLLMServerProvider, LlamaCppServerProvider
@@ -23,12 +26,13 @@ from llama_cpp_agent.providers import VLLMServerProvider, LlamaCppServerProvider
 #    llama_cpp_python = "llama_cpp_python"
 #    tgi_server = "text_generation_inference"
 #    vllm_server = "vllm"
-# provider = config.current_settings[1]
-provider = VLLMServerProvider(
-    "http://thanatos:8081/v1", "solidrust/Mistral-7B-instruct-v0.3-AWQ"
-)
-#provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
-#provider = LlamaCppServerProvider("http://hades:8084")
+provider = config.current_settings[1]
+model="solidrust/Mistral-7B-instruct-v0.3-AWQ"
+#provider = VLLMServerProvider(
+#    base_url="http://thanatos:8081/v1", model=model, #huggingface_model=model,
+#)
+# provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
+# provider = LlamaCppServerProvider("http://hades:8084")
 
 llm_model_type = config.current_settings[0]["model_type"]
 llm_max_tokens = config.current_settings[0]["max_tokens"]
@@ -80,9 +84,9 @@ def respond(
     settings.max_tokens = max_tokens
     settings.repetition_penalty = repetition_penalty
     ## CPPServer Settings
-    #settings.n_predict = max_tokens
-    #settings.repeat_penalty = repetition_penalty
-    
+    # settings.n_predict = max_tokens
+    # settings.repeat_penalty = repetition_penalty
+
     output_settings = LlmStructuredOutputSettings.from_functions(
         [search_tool.get_tool(), write_message_to_user]
     )
@@ -132,17 +136,17 @@ def respond(
         yield outputs
 
     output_settings = LlmStructuredOutputSettings.from_pydantic_models(
-       [CitingSources], LlmStructuredOutputType.object_instance
+        [CitingSources], LlmStructuredOutputType.object_instance
     )
 
     citing_sources = agent.get_chat_response(
-       "Cite the sources you used in your response.",
-       role=Roles.tool,
-       llm_sampling_settings=settings,
-       chat_history=messages,
-       returns_streaming_generator=False,
-       structured_output_settings=output_settings,
-       print_output=False,
+        "Cite the sources you used in your response.",
+        role=Roles.tool,
+        llm_sampling_settings=settings,
+        chat_history=messages,
+        returns_streaming_generator=False,
+        structured_output_settings=output_settings,
+        print_output=False,
     )
     outputs += "\n\nSources:\n"
     outputs += "\n".join(citing_sources.sources)

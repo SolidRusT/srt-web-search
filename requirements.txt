@@ -8,3 +8,6 @@ duckduckgo_search
 trafilatura
 lxml-html-clean
 lxml
+transformers
+sentencepiece
+protobuf

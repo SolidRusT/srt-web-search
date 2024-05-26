@@ -59,7 +59,7 @@ class Config:
             from llama_cpp_agent.providers import VLLMServerProvider
 
             return self.vllm_settings, VLLMServerProvider(
-                base_url=self.vllm_settings["url"], model=self.vllm_settings["model"]
+                base_url=self.vllm_settings["url"], model=self.vllm_settings["model"], huggingface_model=self.vllm_settings["model"]
             )
         elif self.backend_config == "llama_cpp_server":
             from llama_cpp_agent.providers import LlamaCppServerProvider

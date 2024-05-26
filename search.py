@@ -118,7 +118,7 @@ class WebSearchTool:
             if web_info != "":
                 web_info = self.summarising_agent.get_chat_response(
                     f"Please summarize the following Website content and extract relevant information to this query:'{search_query}'.\n\n"
-                    + web_info,
+                    + web_info[:20000],
                     add_response_to_chat_history=False,
                     add_message_to_chat_history=False,
                     llm_sampling_settings=self.settings

@@ -5,19 +5,24 @@ from utils import CitingSources
 from content import css, PLACEHOLDER
 from messages import MessageHandler
 from config import config
-#from search import WebSearchTool
+
+# from search import WebSearchTool
 from llama_cpp_agent import LlamaCppAgent
 from llama_cpp_agent.tools import WebSearchTool
 from llama_cpp_agent.chat_history import BasicChatHistory
 from llama_cpp_agent.chat_history.messages import Roles
 from llama_cpp_agent.llm_output_settings import LlmStructuredOutputSettings
+
 # temp
 from llama_cpp_agent import MessagesFormatterType
-from llama_cpp_agent.providers import VLLMServerProvider
+from llama_cpp_agent.providers import VLLMServerProvider, LlamaCppServerProvider
 
 # Ensure configurations are loaded before accessing them in global scope
-#provider = config.current_settings[1]
-provider = VLLMServerProvider("http://thanatos:8081/v1","solidrust/Mistral-7B-instruct-v0.3-AWQ")
+# provider = config.current_settings[1]
+#provider = VLLMServerProvider(
+#    "http://thanatos:8081/v1", "solidrust/Mistral-7B-instruct-v0.3-AWQ"
+#)
+provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
 
 llm_model_type = config.current_settings[0]["model_type"]
 llm_max_tokens = config.current_settings[0]["max_tokens"]
@@ -43,11 +48,15 @@ def respond(
     model,
 ):
     chat_template = MessageHandler.get_messages_formatter_type(llm_model_type)
-    #search_tool = WebSearchTool(provider, chat_template)
+
     print("<chat_template>", chat_template, "</chat_template>")
-    search_tool = WebSearchTool(provider, MessagesFormatterType.CHATML, 20000)
+    search_tool = WebSearchTool(
+        llm_provider=provider,
+        message_formatter_type=chat_template,
+        max_tokens_search_results=32,
+    )
+
     write_message_to_user = MessageHandler.write_message_to_user
-    send_message_to_user = MessageHandler.send_message_to_user
 
     agent = LlamaCppAgent(
         provider,
@@ -61,9 +70,9 @@ def respond(
     settings.temperature = temperature
     settings.top_k = top_k
     settings.top_p = top_p
-    #settings.n_predict = max_tokens
-    settings.max_tokens = max_tokens
-    settings.repetition_penalty = repetition_penalty
+    # settings.n_predict = max_tokens
+    settings.n_predict = max_tokens
+    settings.repeat_penalty = repetition_penalty
     output_settings = LlmStructuredOutputSettings.from_functions(
         [search_tool.get_tool(), write_message_to_user]
     )
@@ -112,11 +121,11 @@ def respond(
         outputs += text
         yield outputs
 
-    #output_settings = LlmStructuredOutputSettings.from_pydantic_models(
+    # output_settings = LlmStructuredOutputSettings.from_pydantic_models(
     #    [CitingSources], LlmStructuredOutputType.object_instance
-    #)
+    # )
 
-    #citing_sources = agent.get_chat_response(
+    # citing_sources = agent.get_chat_response(
     #    "Cite the sources you used in your response.",
     #    role=Roles.tool,
     #    llm_sampling_settings=settings,
@@ -124,9 +133,9 @@ def respond(
     #    returns_streaming_generator=False,
     #    structured_output_settings=output_settings,
     #    print_output=False,
-    #)
-    #outputs += "\n\nSources:\n"
-    #outputs += "\n".join(citing_sources.sources)
+    # )
+    # outputs += "\n\nSources:\n"
+    # outputs += "\n".join(citing_sources.sources)
     # yield outputs
 
 

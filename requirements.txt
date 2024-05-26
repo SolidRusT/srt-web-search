@@ -11,3 +11,5 @@ lxml
 transformers
 sentencepiece
 protobuf
+bs4
+googlesearch-python

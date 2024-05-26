@@ -99,3 +99,9 @@ curl -f -X POST http://thanatos:8081/v1/completions \
     "temperature": 5
   }'
 ```
+
+## Docker build
+
+```bash
+docker build -t solidrust/srt-web-search -f Dockerfile .
+```

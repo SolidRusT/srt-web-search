@@ -12,10 +12,8 @@ from llama_cpp_agent import LlamaCppAgent
 from llama_cpp_agent.tools import WebSearchTool
 from llama_cpp_agent.chat_history import BasicChatHistory
 from llama_cpp_agent.chat_history.messages import Roles
-from llama_cpp_agent.llm_output_settings import LlmStructuredOutputSettings
-
+from llama_cpp_agent.llm_output_settings import LlmStructuredOutputSettings, LlmStructuredOutputType
 # temp
-from llama_cpp_agent import MessagesFormatterType
 from llama_cpp_agent.providers import VLLMServerProvider, LlamaCppServerProvider
 
 # Ensure configurations are loaded before accessing them in global scope
@@ -123,22 +121,22 @@ def respond(
         outputs += text
         yield outputs
 
-    # output_settings = LlmStructuredOutputSettings.from_pydantic_models(
-    #    [CitingSources], LlmStructuredOutputType.object_instance
-    # )
+    output_settings = LlmStructuredOutputSettings.from_pydantic_models(
+      [CitingSources], LlmStructuredOutputType.object_instance
+    )
 
-    # citing_sources = agent.get_chat_response(
-    #    "Cite the sources you used in your response.",
-    #    role=Roles.tool,
-    #    llm_sampling_settings=settings,
-    #    chat_history=messages,
-    #    returns_streaming_generator=False,
-    #    structured_output_settings=output_settings,
-    #    print_output=False,
-    # )
-    # outputs += "\n\nSources:\n"
-    # outputs += "\n".join(citing_sources.sources)
-    # yield outputs
+    citing_sources = agent.get_chat_response(
+      "Cite the sources you used in your response.",
+      role=Roles.tool,
+      llm_sampling_settings=settings,
+      chat_history=messages,
+      returns_streaming_generator=False,
+      structured_output_settings=output_settings,
+      print_output=False,
+    )
+    outputs += "\n\nSources:\n"
+    outputs += "\n".join(citing_sources.sources)
+    yield outputs
 
 
 main = gr.ChatInterface(

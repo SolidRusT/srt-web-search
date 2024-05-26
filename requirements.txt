@@ -1,5 +1,5 @@
-#llama_cpp_agent>=0.2.11
-llama_cpp_agent @ git+https://github.com/Maximilian-Winter/llama-cpp-agent@master
+llama_cpp_agent>=0.2.13
+#llama_cpp_agent @ git+https://github.com/Maximilian-Winter/llama-cpp-agent@master
 #package-two @ git+https://github.com/owner/repo@releases/tag/v3.7.1
 scikit-build-core
 gradio>=4.31.5

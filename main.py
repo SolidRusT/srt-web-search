@@ -5,14 +5,20 @@ from utils import CitingSources
 from content import css, PLACEHOLDER
 from messages import MessageHandler
 from config import config
-from search import WebSearchTool
+#from search import WebSearchTool
 from llama_cpp_agent import LlamaCppAgent
+from llama_cpp_agent.tools import WebSearchTool
 from llama_cpp_agent.chat_history import BasicChatHistory
 from llama_cpp_agent.chat_history.messages import Roles
 from llama_cpp_agent.llm_output_settings import LlmStructuredOutputSettings
+# temp
+from llama_cpp_agent import MessagesFormatterType
+from llama_cpp_agent.providers import VLLMServerProvider
 
 # Ensure configurations are loaded before accessing them in global scope
-provider = config.current_settings[1]
+#provider = config.current_settings[1]
+provider = VLLMServerProvider("http://thanatos:8081/v1","solidrust/Mistral-7B-instruct-v0.3-AWQ")
+
 llm_model_type = config.current_settings[0]["model_type"]
 llm_max_tokens = config.current_settings[0]["max_tokens"]
 server_name = config.server_name
@@ -37,8 +43,11 @@ def respond(
     model,
 ):
     chat_template = MessageHandler.get_messages_formatter_type(llm_model_type)
-    search_tool = WebSearchTool(provider, chat_template)
+    #search_tool = WebSearchTool(provider, chat_template)
+    print("<chat_template>", chat_template, "</chat_template>")
+    search_tool = WebSearchTool(provider, MessagesFormatterType.CHATML, 20000)
     write_message_to_user = MessageHandler.write_message_to_user
+    send_message_to_user = MessageHandler.send_message_to_user
 
     agent = LlamaCppAgent(
         provider,

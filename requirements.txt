@@ -1,7 +1,8 @@
-llama_cpp_agent>=0.2.10
+llama_cpp_agent>=0.2.11
 scikit-build-core
+gradio>=4.31.5
+openai
 duckduckgo_search
 trafilatura
-gradio>=4.31.5
-# for VLLMServerProvider:
-openai
+lxml-html-clean
+lxml

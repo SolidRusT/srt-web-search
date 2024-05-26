@@ -21,23 +21,30 @@ from llama_cpp_agent.llm_output_settings import (
 from llama_cpp_agent.providers import VLLMServerProvider, LlamaCppServerProvider
 
 # Ensure configurations are loaded before accessing them in global scope
-# provider.get_provider_identifier()
-#    llama_cpp_server = "llama_cpp_server"
-#    llama_cpp_python = "llama_cpp_python"
-#    tgi_server = "text_generation_inference"
-#    vllm_server = "vllm"
-provider = config.current_settings[1]
-model="solidrust/Mistral-7B-instruct-v0.3-AWQ"
 #provider = VLLMServerProvider(
 #    base_url="http://thanatos:8081/v1", model=model, #huggingface_model=model,
 #)
 # provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
 # provider = LlamaCppServerProvider("http://hades:8084")
-
+provider = config.current_settings[1]
+print("Current provider:", provider)
+# provider.get_provider_identifier()
+#    llama_cpp_server = "llama_cpp_server"
+#    llama_cpp_python = "llama_cpp_python"
+#    tgi_server = "text_generation_inference"
+#    vllm_server = "vllm"
+provider_identifier = provider.get_provider_identifier()
+print("Current provider identifier:", provider_identifier)
+model="solidrust/Mistral-7B-instruct-v0.3-AWQ"
+print("Current model:", model)
 llm_model_type = config.current_settings[0]["model_type"]
+print("Current model:", llm_model_type)
 llm_max_tokens = config.current_settings[0]["max_tokens"]
+print("Current model:", llm_max_tokens)
 server_name = config.server_name
 server_port = config.server_port
+print("Current server:", server_name, server_port)
+
 chat_examples = config.chat_examples
 
 # Log startup information

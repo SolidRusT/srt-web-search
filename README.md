@@ -131,3 +131,25 @@ docker run \
   --ipc=host \
   solidrust/srt-web-search
 ```
+
+## vLLM ray server
+
+```bash
+python -m venv ~/venv-vllm
+source ~/venv-vllm/bin/activate
+pip install ray
+```
+
+### Server only
+
+```bash
+ray start --head
+
+python -m vllm.entrypoints.openai.api_server --model solidrust/Mistral-7B-instruct-v0.3-AWQ --dtype auto --api-key $HF_TOKEN --max-model-len 28350 --device auto --gpu-memory-utilization 0.98 --quantization awq --enforce-eager --tensor-parallel-size 2
+```
+
+### Client only
+
+```bash
+ray start --address=<ray-head-address>
+```

@@ -3,7 +3,7 @@ import logging
 import gradio as gr
 # Locals
 from config import config
-from llama_cpp_agent.providers import LlamaCppServerProvider
+from llama_cpp_agent.providers import LlamaCppServerProvider, VLLMServerProvider
 from messages import MessageHandler
 from content import css, PLACEHOLDER
 from utils import CitingSources
@@ -20,10 +20,11 @@ from llama_cpp_agent.tools import WebSearchTool
 from llama_cpp_agent.prompt_templates import web_search_system_prompt, research_system_prompt
 
 # Ensure configurations are loaded before accessing them in global scope
-# provider = VLLMServerProvider(
-#    base_url="http://thanatos:8081/v1", model=model, #huggingface_model=model,
-# )
-# provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
+model="solidrust/Mistral-7B-instruct-v0.3-AWQ"
+#provider = config.current_settings[1]
+#provider = VLLMServerProvider(
+#    base_url="http://thanatos:8000/v1", model=model, huggingface_model=model,
+#  )
 # provider = LlamaCppServerProvider("http://hades:8084")
 provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
 print("Current provider:", provider)
@@ -33,13 +34,6 @@ provider_identifier = provider.get_provider_identifier()
 #    llama_cpp_python = "llama_cpp_python"
 #    tgi_server = "text_generation_inference"
 #    vllm_server = "vllm"
-#provider = config.current_settings[1]
-model="solidrust/Mistral-7B-instruct-v0.3-AWQ"
-#provider = VLLMServerProvider(
-#    base_url="http://thanatos:8081/v1", model=model, #huggingface_model=model,
-#)
-# provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
-# provider = LlamaCppServerProvider("http://hades:8084")
 
 llm_model_type = config.current_settings[0]["model_type"]
 server_name = config.server_name

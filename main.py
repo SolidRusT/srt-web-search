@@ -32,10 +32,21 @@ from llama_cpp_agent.prompt_templates import (
     research_system_prompt,
 )
 
-# Load service config from config module
+# Load UI Service settings from config module
 server_name = config.server_name
 server_port = config.server_port
-topic_examples = config.topic_examples
+# load Persona settings from config module
+persona_app_title = config.app_title
+persona_name = config.persona_name
+persona_full_name = config.persona_full_name
+persona_description = config.description
+persona_avatar_image = config.persona_avatar_image
+persona_ui_theme = config.ui_theme
+persona_topic_examples = config.topic_examples
+persona_system_message = config.system_message
+persona_prompt_message = config.persona
+persona_temperature = config.temperature
+persona_preferences = config.preferences
 
 # Ensure configurations are loaded before accessing them in global scope
 model = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
@@ -49,7 +60,7 @@ tokens_search_results = 8192
 # provider = LlamaCppServerProvider("http://hades:8084")
 # provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
 provider = VLLMServerProvider(
-    base_url="http://thanatos:8000/v1",
+    base_url="http://thanatos:8081/v1",
     model=model,
     huggingface_model=model,
 )
@@ -64,7 +75,7 @@ logging.info(
     model type: {llm_model_type},
     max tokens: {llm_max_tokens}, 
     provider: {provider_identifier},
-    Loaded chat examples: {topic_examples},
+    Loaded chat examples: {persona_topic_examples},
     """
 )
 
@@ -237,7 +248,7 @@ main = gr.ChatInterface(
     undo_btn="Undo",
     clear_btn="Clear",
     submit_btn="Send",
-    examples=topic_examples,
+    examples=persona_topic_examples,
     analytics_enabled=False,
     description="Llama-cpp-agent: Chat Web Search Agent",
     chatbot=gr.Chatbot(scale=1, placeholder=PLACEHOLDER),

@@ -16,21 +16,21 @@ class Config:
         self.persona_name = os.environ.get("PERSONA", "Default")
         self.server_port = int(os.environ.get("PORT", 8650))
         self.server_name = os.environ.get("SERVER_NAME", "0.0.0.0")
-        self.backend_config = os.environ.get("BACKEND_CONFIG", "vllm")
+        #self.backend_config = os.environ.get("BACKEND_CONFIG", "vllm")
 
         # From the config.yaml
-        self.tgi_default_url = random.choice(self.config["tgi_default_urls"])
-        self.vllm_default_url = random.choice(self.config["vllm_default_urls"])
-        self.llama_cpp_server_default_url = random.choice(
-            self.config["llama_cpp_server_default_urls"]
-        )
+        #self.tgi_default_url = random.choice(self.config["tgi_default_urls"])
+        #self.vllm_default_url = random.choice(self.config["vllm_default_urls"])
+        #self.llama_cpp_server_default_url = random.choice(
+        #    self.config["llama_cpp_server_default_urls"]
+        #)
 
         # Settings based on the selected backend
-        self.tgi_settings = self.get_settings(self.tgi_default_url)
-        self.vllm_settings = self.get_settings(self.vllm_default_url)
-        self.llama_cpp_server_settings = self.get_settings(
-            self.llama_cpp_server_default_url
-        )
+        #self.tgi_settings = self.get_settings(self.tgi_default_url)
+        #self.vllm_settings = self.get_settings(self.vllm_default_url)
+        #self.llama_cpp_server_settings = self.get_settings(
+        #    self.llama_cpp_server_default_url
+        #)
 
         self.current_settings = self.get_current_settings()
 
@@ -40,13 +40,13 @@ class Config:
         # Setup logging
         self.setup_logging()
 
-    def get_settings(self, default_url):
-        return {
-            "model": default_url["model"],
-            "model_type": default_url["type"],
-            "url": default_url["url"],
-            "max_tokens": default_url["max_tokens"],
-        }
+    #def get_settings(self, default_url):
+    #    return {
+    #        "model": default_url["model"],
+    #        "model_type": default_url["type"],
+    #        "url": default_url["url"],
+    #        "max_tokens": default_url["max_tokens"],
+    #    }
 
     def get_current_settings(self):
         if self.backend_config == "tgi":

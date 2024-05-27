@@ -4,12 +4,18 @@ import gradio as gr
 
 # Locals
 from config import config
-from llama_cpp_agent.providers import LlamaCppServerProvider, VLLMServerProvider
 from messages import MessageHandler
 from content import css, PLACEHOLDER
 from utils import CitingSources
 
 # Agents
+from llama_cpp_agent.providers import (
+    LlamaCppServerProvider,
+    LlamaCppPythonProvider,
+    VLLMServerProvider,
+    TGIServerProvider,
+    LlamaCppPythonProvider,
+)
 from llama_cpp_agent import LlamaCppAgent
 from llama_cpp_agent.chat_history import BasicChatHistory
 from llama_cpp_agent.chat_history.messages import Roles
@@ -25,33 +31,31 @@ from llama_cpp_agent.prompt_templates import (
     research_system_prompt,
 )
 
+# Load service config from config module
+server_name = config.server_name
+server_port = config.server_port
+
 # Ensure configurations are loaded before accessing them in global scope
 model = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
-# provider = config.current_settings[1]
+llm_model_type = "Mistral"
+#llm_model_type = config.current_settings[0]["model_type"]
+llm_max_tokens = 16384
+#llm_max_tokens = config.current_settings[0]["max_tokens"]
+
+# provider = LlamaCppServerProvider("http://hades:8084")
+# provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
 provider = VLLMServerProvider(
     base_url="http://thanatos:8000/v1",
     model=model,
     huggingface_model=model,
 )
-# provider = LlamaCppServerProvider("http://hades:8084")
-# provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
+# provider = config.current_settings[1]
+
 print("Current provider:", provider)
 provider_identifier = provider.get_provider_identifier()
 identifier_str = str(provider_identifier).split(".")[-1]
 
-print("Provider identifier:", identifier_str)
-print("Provider intentifier:", provider_identifier)
-# provider.get_provider_identifier()
-#    llama_cpp_server = "llama_cpp_server"
-#    llama_cpp_python = "llama_cpp_python"
-#    tgi_server = "text_generation_inference"
-#    vllm_server = "vllm"
-
-
-llm_model_type = config.current_settings[0]["model_type"]
-server_name = config.server_name
-server_port = config.server_port
-llm_max_tokens = config.current_settings[0]["max_tokens"]
+# Import examples from persona yaml
 chat_examples = config.chat_examples
 
 # Log startup information

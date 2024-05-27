@@ -125,7 +125,7 @@ def respond(
         settings.max_tokens = max_tokens
         settings.repetition_penalty = repetition_penalty
     else:
-        return "unsupported provider"
+        return "unsupported llama-cpp-agent provider:", identifier_str
 
     output_settings = LlmStructuredOutputSettings.from_functions(
         [search_tool.get_tool()]

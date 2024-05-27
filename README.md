@@ -62,12 +62,46 @@ docker run --gpus "device=$gpus" --shm-size 4g -p $service_port:80 \
   --quantize awq
 ```
 
-### vLLM NVIDIA
+### vLLM Provider
+
+Set your provider and model.
+
+```python
+from llama_cpp_agent.providers import VLLMServerProvider
+
+model = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
+llm_model_type = "Mistral"  # config.current_settings[0]["model_type"]
+llm_max_tokens = 16384  # config.current_settings[0]["max_tokens"]
+tokens_per_summary = 2048
+tokens_search_results = 8192
+
+provider = VLLMServerProvider(
+    base_url="http://localhost:8000/v1",
+    model=model,
+    huggingface_model=model,
+)
+```
+
+Launch a vLLM backend using a python virtual environment.
 
 ```bash
+#export HF_TOKEN=<your_huggingface_token>
+python -m venv ~/venv-vllm
+source ~/venv-vllm/bin/activate
+pip install vllm openai autoawq --no-cache-dir
+
+python -m vllm.entrypoints.openai.api_server --model solidrust/Mistral-7B-instruct-v0.3-AWQ --dtype auto --api-key $HF_TOKEN --max-model-len 28350 --device auto --gpu-memory-utilization 0.98 --quantization awq --enforce-eager --tensor-parallel-size 2 --port 8081
+```
+
+Launch a backend using NVIDIA Docker.
+
+```bash
+model="solidrust/Mistral-7B-instruct-v0.3-AWQ"  # Quantized model
+#model="mistralai/Mistral-7B-instruct-v0.3"  # Production model
+
+# vLLM NVIDIA example
 # https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html
-#model="mistralai/Mistral-7B-instruct-v0.3"
-model="solidrust/Mistral-7B-instruct-v0.3-AWQ"
+
 docker run --runtime nvidia --gpus all \
     -v ~/.cache/huggingface:/root/.cache/huggingface \
     --env "HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}" \
@@ -85,11 +119,16 @@ docker run --runtime nvidia --gpus all \
     --max-model-len 32768
 ```
 
-## Thanatos inference vLLM
+### Thanatos inference vLLM AWQ example
+
+Open a tmux or screens session, and launch the vLLM server using docker.
 
 ```bash
+#export HF_TOKEN=<your_huggingface_token>
 docker run --runtime nvidia --gpus all     -v ~/.cache/huggingface:/root/.cache/huggingface     --env "HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}"     -p 8081:8000     --ipc=host     vllm/vllm-openai:latest     --model solidrust/Mistral-7B-instruct-v0.3-AWQ --tokenizer solidrust/Mistral-7B-instruct-v0.3-AWQ --trust-remote-code --dtype auto --device auto --gpu-memory-utilization 0.98 --quantization awq  --max-model-len 28350 --enforce-eager
 ```
+
+Test inference using curl.
 
 ```bash
 curl -f -X POST http://thanatos:8081/v1/completions \
@@ -102,9 +141,12 @@ curl -f -X POST http://thanatos:8081/v1/completions \
   }'
 ```
 
-## Zelus inference vLLM
+### Zelus inference vLLM
+
+Meta Llama-3 8B Instruct AWQ example.
 
 ```bash
+#export HF_TOKEN=<your_huggingface_token>
 docker run --runtime nvidia --gpus all     -v ~/.cache/huggingface:/root/.cache/huggingface     --env "HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}"     -p 8081:8000     --ipc=host     vllm/vllm-openai:latest     --model solidrust/Meta-Llama-3-8B-Instruct-AWQ --tokenizer solidrust/Meta-Llama-3-8B-Instruct-AWQ --trust-remote-code --dtype auto --device auto --gpu-memory-utilization 0.98 --quantization awq --max-model-len 8192 --enforce-eager
 ```
 
@@ -119,9 +161,11 @@ curl -f -X POST http://zelus:8081/v1/completions \
   }'
 ```
 
-## Docker build
+## srt-web-search Docker build
 
 ```bash
+#export HF_TOKEN=<your_huggingface_token>
+#export OPENAI_API_KEY=<your_local_openai_compatible_key>
 docker build -t solidrust/srt-web-search -f Dockerfile .
 docker run \
   -v ~/.cache/huggingface:/root/.cache/huggingface \
@@ -132,7 +176,7 @@ docker run \
   solidrust/srt-web-search
 ```
 
-## vLLM ray server
+### [WIP] vLLM ray server (optional)
 
 ```bash
 python -m venv ~/venv-vllm
@@ -140,16 +184,27 @@ source ~/venv-vllm/bin/activate
 pip install ray
 ```
 
-### Server only
+#### Server only
 
 ```bash
+#export HF_TOKEN=<your_huggingface_token>
 ray start --head
-
-python -m vllm.entrypoints.openai.api_server --model solidrust/Mistral-7B-instruct-v0.3-AWQ --dtype auto --api-key $HF_TOKEN --max-model-len 28350 --device auto --gpu-memory-utilization 0.98 --quantization awq --enforce-eager --tensor-parallel-size 2
+# Save this connection address var as RAY_HEAD_ADDRESS on your clients.
 ```
 
-### Client only
+Launch a vLLM backend using python within the ray server head node environment.
 
 ```bash
-ray start --address=<ray-head-address>
+python -m vllm.entrypoints.openai.api_server --model solidrust/Mistral-7B-instruct-v0.3-AWQ --dtype auto --api-key $HF_TOKEN --max-model-len 28350 --device auto --gpu-memory-utilization 0.98 --quantization awq --enforce-eager --tensor-parallel-size 2 --port 8081
+```
+
+Play with the `--tensor-parallel-size 2` to distribute the work across the ray server client nodes.
+
+#### Client only
+
+Add a client node to the ray server
+
+```bash
+#export RAY_HEAD_ADDRESS=<ray-head-address>
+ray start --address=$RAY_HEAD_ADDRESS
 ```

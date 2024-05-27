@@ -34,16 +34,17 @@ from llama_cpp_agent.prompt_templates import (
 # Load service config from config module
 server_name = config.server_name
 server_port = config.server_port
+chat_examples = config.chat_examples
 
 # Ensure configurations are loaded before accessing them in global scope
 model = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
-llm_model_type = "Mistral"
-#llm_model_type = config.current_settings[0]["model_type"]
-llm_max_tokens = 16384
-#llm_max_tokens = config.current_settings[0]["max_tokens"]
+llm_model_type = "Mistral"  # config.current_settings[0]["model_type"]
+llm_max_tokens = 16384  # config.current_settings[0]["max_tokens"]
 tokens_per_summary = 2048
 tokens_search_results = 8192
 
+# Configure provider
+# provider = config.current_settings[1]
 # provider = LlamaCppServerProvider("http://hades:8084")
 # provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
 provider = VLLMServerProvider(
@@ -51,14 +52,8 @@ provider = VLLMServerProvider(
     model=model,
     huggingface_model=model,
 )
-# provider = config.current_settings[1]
-
-print("Current provider:", provider)
 provider_identifier = provider.get_provider_identifier()
 identifier_str = str(provider_identifier).split(".")[-1]
-
-# Import examples from persona yaml
-chat_examples = config.chat_examples
 
 # Log startup information
 logging.info(

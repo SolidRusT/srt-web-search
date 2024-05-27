@@ -82,7 +82,7 @@ class Config:
         self.description = persona["description"]
         self.system_message = persona["system_message"]
         self.persona = persona["persona"]
-        self.chat_examples = persona["topic_examples"]
+        self.topic_examples = persona["topic_examples"]
         self.temperature = persona["temperature"]
         self.preferences = persona["preferences"]
 

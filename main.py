@@ -35,7 +35,7 @@ from llama_cpp_agent.prompt_templates import (
 # Load service config from config module
 server_name = config.server_name
 server_port = config.server_port
-chat_examples = config.chat_examples
+topic_examples = config.topic_examples
 
 # Ensure configurations are loaded before accessing them in global scope
 model = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
@@ -64,7 +64,7 @@ logging.info(
     model type: {llm_model_type},
     max tokens: {llm_max_tokens}, 
     provider: {provider_identifier},
-    Loaded chat examples: {chat_examples},
+    Loaded chat examples: {topic_examples},
     """
 )
 
@@ -237,7 +237,7 @@ main = gr.ChatInterface(
     undo_btn="Undo",
     clear_btn="Clear",
     submit_btn="Send",
-    examples=chat_examples,
+    examples=topic_examples,
     analytics_enabled=False,
     description="Llama-cpp-agent: Chat Web Search Agent",
     chatbot=gr.Chatbot(scale=1, placeholder=PLACEHOLDER),

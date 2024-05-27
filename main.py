@@ -1,12 +1,14 @@
 # Defaults
 import logging
 import gradio as gr
+
 # Locals
 from config import config
 from llama_cpp_agent.providers import LlamaCppServerProvider, VLLMServerProvider
 from messages import MessageHandler
 from content import css, PLACEHOLDER
 from utils import CitingSources
+
 # Agents
 from llama_cpp_agent import LlamaCppAgent
 from llama_cpp_agent.chat_history import BasicChatHistory
@@ -15,21 +17,27 @@ from llama_cpp_agent.llm_output_settings import (
     LlmStructuredOutputSettings,
     LlmStructuredOutputType,
 )
+
 # Tools
 from llama_cpp_agent.tools import WebSearchTool
-from llama_cpp_agent.prompt_templates import web_search_system_prompt, research_system_prompt
+from llama_cpp_agent.prompt_templates import (
+    web_search_system_prompt,
+    research_system_prompt,
+)
 
 # Ensure configurations are loaded before accessing them in global scope
-model="solidrust/Mistral-7B-instruct-v0.3-AWQ"
-#provider = config.current_settings[1]
+model = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
+# provider = config.current_settings[1]
 provider = VLLMServerProvider(
-    base_url="http://thanatos:8000/v1", model=model, huggingface_model=model,
-  )
-#provider = LlamaCppServerProvider("http://hades:8084")
-#provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
+    base_url="http://thanatos:8000/v1",
+    model=model,
+    huggingface_model=model,
+)
+# provider = LlamaCppServerProvider("http://hades:8084")
+# provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
 print("Current provider:", provider)
 provider_identifier = provider.get_provider_identifier()
-identifier_str = str(provider_identifier).split('.')[-1]
+identifier_str = str(provider_identifier).split(".")[-1]
 
 print("Provider identifier:", identifier_str)
 print("Provider intentifier:", provider_identifier)
@@ -38,7 +46,6 @@ print("Provider intentifier:", provider_identifier)
 #    llama_cpp_python = "llama_cpp_python"
 #    tgi_server = "text_generation_inference"
 #    vllm_server = "vllm"
-
 
 
 llm_model_type = config.current_settings[0]["model_type"]
@@ -58,6 +65,7 @@ logging.info(
     Loaded chat examples: {chat_examples},
     """
 )
+
 
 ## Run inference
 def respond(
@@ -100,20 +108,21 @@ def respond(
     settings.temperature = temperature
     settings.top_k = top_k
     settings.top_p = top_p
-    
-    if "llama_cpp_server" in identifier_str:
-      ## CPPServer Settings
-      settings.n_predict = max_tokens
-      settings.repeat_penalty = repetition_penalty
-    #elif "LlmProviderId.llama_cpp_python" in provider_identifier:
-    #elif "LlmProviderId.tgi_server" in provider_identifier:
-    elif "vllm_server" in identifier_str:
-      ## vLLM Provider Settings
-      settings.max_tokens = max_tokens
-      settings.repetition_penalty = repetition_penalty    
-    else:
-      return "unsupported"
 
+    if "llama_cpp_server" in identifier_str:
+        settings.n_predict = max_tokens
+        settings.repeat_penalty = repetition_penalty
+    elif "llama_cpp_python" in identifier_str:
+        settings.n_predict = max_tokens
+        settings.repeat_penalty = repetition_penalty
+    elif "tgi_server" in identifier_str:
+        settings.max_tokens = max_tokens
+        settings.repetition_penalty = repetition_penalty
+    elif "vllm_server" in identifier_str:
+        settings.max_tokens = max_tokens
+        settings.repetition_penalty = repetition_penalty
+    else:
+        return "unsupported provider"
 
     output_settings = LlmStructuredOutputSettings.from_functions(
         [search_tool.get_tool()]
@@ -140,7 +149,8 @@ def respond(
 
     settings.stream = True
     response_text = answer_agent.get_chat_response(
-        f"Write a detailed and complete research document that fulfills the following user request: '{message}', based on the information from the web below.\n\n" + result[0]["return_value"],
+        f"Write a detailed and complete research document that fulfills the following user request: '{message}', based on the information from the web below.\n\n"
+        + result[0]["return_value"],
         role=Roles.tool,
         llm_sampling_settings=settings,
         chat_history=messages,

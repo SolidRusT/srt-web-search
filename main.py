@@ -1,4 +1,5 @@
 # Defaults
+import datetime
 import logging
 import gradio as gr
 
@@ -86,6 +87,7 @@ def respond(
     search_tool = WebSearchTool(
         llm_provider=provider,
         message_formatter_type=chat_template,
+        model_max_context_tokens=llm_max_tokens,
         max_tokens_search_results=tokens_search_results,
         max_tokens_per_summary=tokens_per_summary,
     )
@@ -99,7 +101,7 @@ def respond(
 
     answer_agent = LlamaCppAgent(
         provider,
-        system_prompt=research_system_prompt,
+        system_prompt=system_message,
         predefined_messages_formatter_type=chat_template,
         debug_output=True,
     )
@@ -138,7 +140,7 @@ def respond(
         messages.add_message(assistant)
 
     result = web_search_agent.get_chat_response(
-        message,
+        f"Current Date and Time(d/m/y, h:m:s): {datetime.datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}\n\nUser Query: " + message,
         llm_sampling_settings=settings,
         structured_output_settings=output_settings,
         add_message_to_chat_history=False,
@@ -186,7 +188,7 @@ main = gr.ChatInterface(
     respond,
     additional_inputs=[
         gr.Textbox(
-            value=web_search_system_prompt,
+            value=research_system_prompt,
             label="System message",
             interactive=True,
         ),
@@ -235,7 +237,7 @@ main = gr.ChatInterface(
     undo_btn="Undo",
     clear_btn="Clear",
     submit_btn="Send",
-    examples=(chat_examples),
+    examples=chat_examples,
     analytics_enabled=False,
     description="Llama-cpp-agent: Chat Web Search Agent",
     chatbot=gr.Chatbot(scale=1, placeholder=PLACEHOLDER),

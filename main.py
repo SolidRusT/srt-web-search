@@ -22,18 +22,24 @@ from llama_cpp_agent.prompt_templates import web_search_system_prompt, research_
 # Ensure configurations are loaded before accessing them in global scope
 model="solidrust/Mistral-7B-instruct-v0.3-AWQ"
 #provider = config.current_settings[1]
-#provider = VLLMServerProvider(
-#    base_url="http://thanatos:8000/v1", model=model, huggingface_model=model,
-#  )
-# provider = LlamaCppServerProvider("http://hades:8084")
-provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
+provider = VLLMServerProvider(
+    base_url="http://thanatos:8000/v1", model=model, huggingface_model=model,
+  )
+#provider = LlamaCppServerProvider("http://hades:8084")
+#provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
 print("Current provider:", provider)
 provider_identifier = provider.get_provider_identifier()
+identifier_str = str(provider_identifier).split('.')[-1]
+
+print("Provider identifier:", identifier_str)
+print("Provider intentifier:", provider_identifier)
 # provider.get_provider_identifier()
 #    llama_cpp_server = "llama_cpp_server"
 #    llama_cpp_python = "llama_cpp_python"
 #    tgi_server = "text_generation_inference"
 #    vllm_server = "vllm"
+
+
 
 llm_model_type = config.current_settings[0]["model_type"]
 server_name = config.server_name
@@ -94,12 +100,20 @@ def respond(
     settings.temperature = temperature
     settings.top_k = top_k
     settings.top_p = top_p
-    ## vLLM Provider Settings
-    #settings.max_tokens = max_tokens
-    #settings.repetition_penalty = repetition_penalty
-    ## CPPServer Settings
-    settings.n_predict = max_tokens
-    settings.repeat_penalty = repetition_penalty
+    
+    if "llama_cpp_server" in identifier_str:
+      ## CPPServer Settings
+      settings.n_predict = max_tokens
+      settings.repeat_penalty = repetition_penalty
+    #elif "LlmProviderId.llama_cpp_python" in provider_identifier:
+    #elif "LlmProviderId.tgi_server" in provider_identifier:
+    elif "vllm_server" in identifier_str:
+      ## vLLM Provider Settings
+      settings.max_tokens = max_tokens
+      settings.repetition_penalty = repetition_penalty    
+    else:
+      return "unsupported"
+
 
     output_settings = LlmStructuredOutputSettings.from_functions(
         [search_tool.get_tool()]

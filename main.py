@@ -41,6 +41,8 @@ llm_model_type = "Mistral"
 #llm_model_type = config.current_settings[0]["model_type"]
 llm_max_tokens = 16384
 #llm_max_tokens = config.current_settings[0]["max_tokens"]
+tokens_per_summary = 2048
+tokens_search_results = 8192
 
 # provider = LlamaCppServerProvider("http://hades:8084")
 # provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
@@ -89,8 +91,8 @@ def respond(
     search_tool = WebSearchTool(
         llm_provider=provider,
         message_formatter_type=chat_template,
-        max_tokens_search_results=12000,
-        max_tokens_per_summary=2048,
+        max_tokens_search_results=tokens_search_results,
+        max_tokens_per_summary=tokens_per_summary,
     )
 
     web_search_agent = LlamaCppAgent(

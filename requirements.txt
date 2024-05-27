@@ -1,4 +1,4 @@
-llama_cpp_agent>=0.2.17
+llama_cpp_agent>=0.2.19
 #llama_cpp_agent @ git+https://github.com/Maximilian-Winter/llama-cpp-agent@master
 #package-two @ git+https://github.com/owner/repo@releases/tag/v3.7.1
 scikit-build-core

@@ -4,10 +4,10 @@ import logging
 import gradio as gr
 
 ## Local imports
-from config import config
-from messages import MessageHandler
-from content import css, PLACEHOLDER
-from utils import CitingSources
+from app.config import config
+from app.messages import MessageHandler
+from app.content import css, PLACEHOLDER
+from app.utils import CitingSources
 
 ## Agent Configuration
 from llama_cpp_agent import LlamaCppAgent

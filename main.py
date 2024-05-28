@@ -68,19 +68,19 @@ provider = VLLMServerProvider(
     huggingface_model=model,
 )
 ## vLLM Server provider for summary
-#llm_summary_url = "http://zelus.hq.solidrust.net:8083/v1"
-llm_summary_url = "http://zelus:8081/v1"
-model_summary = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
-llm_model_summary_type = "Llama3"
-llm_summary_max_tokens = 8182
+#summary_llm_url = "http://zelus.hq.solidrust.net:8083/v1"
+summary_llm_url = "http://zelus:8081/v1"
+summary_model = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
+summary_llm_model_type = "Mistral"
+summary_llm_max_tokens = 16384
 tokens_per_summary = 2048
 tokens_search_results = 8192
 number_of_search_results = 3
 
-provider_summary = VLLMServerProvider(
-    base_url=llm_summary_url,
-    model=model_summary,
-    huggingface_model=model_summary,
+summary_provider = VLLMServerProvider(
+    base_url=summary_llm_url,
+    model=summary_model,
+    huggingface_model=summary_model,
 )
 ## vLLM Embeddings Server provider
 llm_embeddings_url = ""
@@ -105,7 +105,7 @@ logging.info(
     server: {server_name}:{server_port},
     model: {model},
     model type: {llm_model_type},
-    model summary type: {llm_model_summary_type},
+    model summary type: {summary_llm_model_type},
     max tokens: {llm_max_tokens}, 
     provider: {provider_identifier},
     Loaded chat examples: {persona_topic_examples},
@@ -126,7 +126,7 @@ def respond(
     model,
 ):
     chat_template = MessageHandler.get_messages_formatter_type(llm_model_type)
-    chat_template_summary = MessageHandler.get_messages_formatter_type(llm_model_summary_type)
+    summary_chat_template = MessageHandler.get_messages_formatter_type(summary_llm_model_type)
 
     logging.info(f"Loaded chat examples: {chat_template}")
     search_tool = WebSearchTool(
@@ -139,9 +139,9 @@ def respond(
     )
 
     web_search_agent = LlamaCppAgent(
-        provider=provider,
+        provider=summary_provider, # provider, summary_provider
         system_prompt=web_search_system_prompt,
-        predefined_messages_formatter_type=chat_template,
+        predefined_messages_formatter_type=summary_chat_template,  # chat_template, summary_chat_template
         debug_output=False,
     )
 
@@ -149,7 +149,7 @@ def respond(
         provider=provider,
         system_prompt=system_message,
         predefined_messages_formatter_type=chat_template,
-        debug_output=True,
+        debug_output=False,
     )
 
     settings = provider.get_provider_default_settings()

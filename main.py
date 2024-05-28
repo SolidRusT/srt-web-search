@@ -50,38 +50,16 @@ persona_preferences = config.preferences
 # Ensure configurations are loaded before accessing them in global scope
 # Configure providers
 # Default provider
-llm_url = config.default_llm_url
-#llm_url = "http://thanatos.hq.solidrust.net:8082/v1"
-model = config.default_llm_model
 llm_model_type = config.default_llm_type
 llm_max_tokens = config.default_llm_max_tokens
-
 # Summary provider
-summary_llm_url = config.summary_llm_url
-#summary_llm_url = "http://zelus.hq.solidrust.net:8083/v1"
-summary_model = config.summary_llm_model
 summary_llm_model_type = config.summary_llm_type
 summary_llm_max_tokens = config.summary_llm_max_tokens
 
 # Provider specific settings
 ## CPP Server provider
-# provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
-# provider = LlamaCppServerProvider(llm_url)
-
-## vLLM Server Provider
-
-provider = VLLMServerProvider(
-    base_url=llm_url,
-    model=model,
-    huggingface_model=model,
-)
-summary_provider = VLLMServerProvider(
-    base_url=summary_llm_url,
-    model=summary_model,
-    huggingface_model=summary_model,
-)
-## vLLM Embeddings Server provider
-llm_embeddings_url = ""
+# provider = LlamaCppServerProvider(config.default_llm_url)
+# summary_provider = LlamaCppServerProvider(config.summary_llm_url)
 
 ## CPP Python providers
 #llm = Llama(
@@ -93,6 +71,22 @@ llm_embeddings_url = ""
 #        n_ctx=llm_max_tokens,
 #    )
 #provider = LlamaCppPythonProvider(llm)
+
+## vLLM Server Provider
+provider = VLLMServerProvider(
+    base_url=config.default_llm_url,
+    model=config.default_llm_model,
+    huggingface_model=config.default_llm_model,
+)
+summary_provider = VLLMServerProvider(
+    base_url=config.summary_llm_url,
+    model=config.summary_llm_model,
+    huggingface_model=config.summary_llm_model,
+)
+
+## TGI Server Provider
+# provider = TGIServerProvider(config.default_llm_url)
+# summary_provider = TGIServerProvider(config.summary_llm_url)
 
 # WebSearch settings
 tokens_per_summary = 3000

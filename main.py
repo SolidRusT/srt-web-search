@@ -25,21 +25,12 @@ from llama_cpp_agent.prompt_templates import (
     research_system_prompt,
 )
 
-## Agent Providers
-default_provider = config.default_provider
-summary_provider = config.summary_provider
-
 # Load parameters from the agent provider
-default_provider_identifier = default_provider.get_provider_identifier()
-summary_provider_identifier = summary_provider.get_provider_identifier()
+default_provider_identifier = config.default_provider.get_provider_identifier()
+summary_provider_identifier = config.summary_provider.get_provider_identifier()
 
 default_identifier_str = str(default_provider_identifier).split(".")[-1]
 #summary_identifier_str = str(summary_provider_identifier).split(".")[-1]  # unused
-
-# WebSearch settings
-tokens_per_summary = 4096
-tokens_search_results = 8192
-number_of_search_results = 3
 
 ## Log startup information
 logging.info(
@@ -75,29 +66,29 @@ def respond(
 
     logging.info(f"Loaded chat examples: {default_chat_template}")
     search_tool = WebSearchTool(
-        llm_provider=default_provider,
+        llm_provider=config.default_provider,
         message_formatter_type=default_chat_template,
         model_max_context_tokens=config.default_llm_max_tokens,
-        max_tokens_search_results=tokens_search_results,
-        max_tokens_per_summary=tokens_per_summary,
-        number_of_search_results=number_of_search_results,
+        max_tokens_search_results=config.tokens_search_results,
+        max_tokens_per_summary=config.tokens_per_summary,
+        number_of_search_results=config.number_of_search_results,
     )
 
     web_search_agent = LlamaCppAgent(
-        provider=summary_provider,  # provider, summary_provider
+        provider=config.summary_provider,  # provider, summary_provider
         system_prompt=web_search_system_prompt,
         predefined_messages_formatter_type=summary_chat_template,  # chat_template, summary_chat_template
         debug_output=False,
     )
 
     answer_agent = LlamaCppAgent(
-        provider=default_provider,
+        provider=config.default_provider,
         system_prompt=system_message,
         predefined_messages_formatter_type=default_chat_template,
         debug_output=False,
     )
 
-    settings = default_provider.get_provider_default_settings()
+    settings = config.default_provider.get_provider_default_settings()
     settings.stream = False
     settings.temperature = temperature
     settings.top_k = top_k

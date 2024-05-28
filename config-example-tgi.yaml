@@ -3,6 +3,9 @@ website_url: 'https://search.solidrust.net'
 openai_compatible_api_key: '<some_key_here>'
 huggingface_api_key: '<some_key_here>'
 logs_path: 'logs'
+tokens_per_summary: 4096
+tokens_search_results: 8192
+number_of_search_results: 3
 llms:
   default:
     name: 'default'
@@ -12,7 +15,7 @@ llms:
     url: 'http://erebus.hq.solidrust.net:8081'
     agent_provider: 'tgi_server'
     server: 'Erebus'
-    max_tokens: 8192
+    max_tokens: 4096
   summary:
     name: 'summary'
     type: ChatML
@@ -21,7 +24,7 @@ llms:
     url: 'http://erebus.hq.solidrust.net:8081'
     agent_provider: 'tgi_server'
     server: 'Erebus'
-    max_tokens: 8192
+    max_tokens: 4096
 personas:
   # Assistants (gradio)
   Default:

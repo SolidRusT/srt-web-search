@@ -3,6 +3,9 @@ website_url: 'https://search.solidrust.net'
 openai_compatible_api_key: '<some_key_here>'
 huggingface_api_key: '<some_key_here>'
 logs_path: 'logs'
+tokens_per_summary: 4096
+tokens_search_results: 8192
+number_of_search_results: 3
 llms:
   default:
     name: 'default'

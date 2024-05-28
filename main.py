@@ -54,6 +54,7 @@ llm_model_type = "Mistral"  # config.current_settings[0]["model_type"]
 llm_max_tokens = 16384  # config.current_settings[0]["max_tokens"]
 tokens_per_summary = 2048
 tokens_search_results = 8192
+number_of_search_results = 3
 
 # Configure provider
 # provider = config.current_settings[1]
@@ -101,6 +102,10 @@ def respond(
         model_max_context_tokens=llm_max_tokens,
         max_tokens_search_results=tokens_search_results,
         max_tokens_per_summary=tokens_per_summary,
+        number_of_search_results=number_of_search_results,
+        ## WebSearchTool defaults (llama-cpp-agent-0.2.20)
+        #temperature=0.45, top_p=0.95, top_k=40,
+        #web_crawler=WebCrawler, web_search_provider=WebSearchProvider,
     )
 
     web_search_agent = LlamaCppAgent(

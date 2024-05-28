@@ -50,7 +50,7 @@ deactivate
 
 ## Using the Docker build
 
-Configure the app, then make a docker image of it.
+Configure a `config.yaml` file, then make a docker image with it.
 
 ```bash
 docker build -t solidrust/srt-web-search -f Dockerfile .
@@ -59,15 +59,16 @@ docker build -t solidrust/srt-web-search -f Dockerfile .
 Run the new image.
 
 ```bash
-export HF_TOKEN=<your_huggingface_token>
-export OPENAI_API_KEY=<your_local_openai_compatible_key>
-export SERVICE_PORT=8650
+export HF_TOKEN=${HF_TOKEN}
+export OPENAI_API_KEY=${OPENAI_API_KEY}
+export LOCAL_SERVICE_PORT=8650
+export DOCKER_IMAGE="solidrust/srt-web-search:latest"
 
 docker run \
   -v ~/.cache/huggingface:/root/.cache/huggingface \
   --env "HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}" \
   --env "OPENAI_API_KEY=${OPENAI_API_KEY}" \
-  -p ${SERVICE_PORT}:8650 \
+  -p ${LOCAL_SERVICE_PORT}:8650 \
   --ipc=host \
-  solidrust/srt-web-search:latest
+  ${DOCKER_IMAGE}
 ```

@@ -56,8 +56,8 @@ persona_preferences = config.preferences
 # provider = LlamaCppServerProvider(llm_url)
 
 ## vLLM Server provider
-#llm_url = "http://thanatos.hq.solidrust.net:8082/v1"
-llm_url = "http://thanatos:8081/v1"
+llm_url = "http://thanatos.hq.solidrust.net:8082/v1"
+#llm_url = "http://thanatos:8081/v1"
 model = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
 llm_model_type = "Mistral"          # config.current_settings[0]["model_type"]
 llm_max_tokens = 16384 
@@ -68,8 +68,8 @@ provider = VLLMServerProvider(
     huggingface_model=model,
 )
 ## vLLM Server provider for summary
-#llm_summary_url = "http://zelus.hq.solidrust.net:8083/v1"
-llm_summary_url = "http://zelus:8081/v1"
+llm_summary_url = "http://zelus.hq.solidrust.net:8083/v1"
+#llm_summary_url = "http://zelus:8081/v1"
 model_summary = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
 llm_model_summary_type = "Llama3"
 llm_summary_max_tokens = 8182

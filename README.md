@@ -2,9 +2,69 @@
 
 Web Search using llama-cpp-agent
 
-example: "How many NBA championship wins do the Chicago Bulls hold?"
+## Requirements
 
-## Inference Examples
+- Python 3.11
+- Python Virtualenv
+
+## Installation
+
+```bash
+python -m venv ~/venv-vllm
+source ~/venv-vllm/bin/activate
+
+pip install wheel setuptools
+pip install -U -r requirements.txt
+
+deactivate
+```
+
+## Upgrading
+
+```bash
+python -m venv ~/venv-vllm
+source ~/venv-vllm/bin/activate
+
+pip uninstall llama_cpp_agent -y
+pip install -U -r requirements.txt --no-cache-dir
+
+deactivate
+```
+
+## Running Web Search UI
+
+```bash
+python -m venv ~/venv-vllm
+source ~/venv-vllm/bin/activate
+
+python main.py
+
+deactivate
+```
+
+## Using the Docker build
+
+Configure the app, then make a docker image of it.
+
+```bash
+#export HF_TOKEN=<your_huggingface_token>
+#export OPENAI_API_KEY=<your_local_openai_compatible_key>
+docker build -t solidrust/srt-web-search -f Dockerfile .
+```
+
+Run the new image.
+
+```bash
+docker run \
+  -v ~/.cache/huggingface:/root/.cache/huggingface \
+  --env "HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}" \
+  --env "OPENAI_API_KEY=${OPENAI_API_KEY}" \
+  -p 8650:8650 \
+  --ipc=host \
+  solidrust/srt-web-search
+```
+
+## LLM Inference Examples
 
 ### llama-cpp-server
 
@@ -171,21 +231,6 @@ curl -f -X POST http://zelus:8081/v1/completions \
     "max_tokens": 512,
     "temperature": 5
   }'
-```
-
-## srt-web-search Docker build
-
-```bash
-#export HF_TOKEN=<your_huggingface_token>
-#export OPENAI_API_KEY=<your_local_openai_compatible_key>
-docker build -t solidrust/srt-web-search -f Dockerfile .
-docker run \
-  -v ~/.cache/huggingface:/root/.cache/huggingface \
-  --env "HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}" \
-  --env "OPENAI_API_KEY=${OPENAI_API_KEY}" \
-  -p 8650:8650 \
-  --ipc=host \
-  solidrust/srt-web-search
 ```
 
 ### [WIP] vLLM ray server (optional)

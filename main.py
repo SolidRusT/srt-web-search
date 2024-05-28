@@ -60,7 +60,7 @@ llm_url = "http://thanatos.hq.solidrust.net:8082/v1"
 #llm_url = "http://thanatos:8081/v1"
 model = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
 llm_model_type = "Mistral"          # config.current_settings[0]["model_type"]
-llm_max_tokens = 16384 
+llm_max_tokens = 25000 
 
 provider = VLLMServerProvider(
     base_url=llm_url,
@@ -72,9 +72,9 @@ summary_llm_url = "http://zelus.hq.solidrust.net:8083/v1"
 #summary_llm_url = "http://zelus:8081/v1"
 summary_model = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
 summary_llm_model_type = "Mistral"
-summary_llm_max_tokens = 16384
-tokens_per_summary = 2048
-tokens_search_results = 8192
+summary_llm_max_tokens = 25000
+tokens_per_summary = 3000
+tokens_search_results = 10000
 number_of_search_results = 3
 
 summary_provider = VLLMServerProvider(

@@ -29,17 +29,17 @@ from llama_cpp_agent.prompt_templates import (
 default_provider = config.default_provider
 summary_provider = config.default_provider
 
-# WebSearch settings
-tokens_per_summary = 3000
-tokens_search_results = 10000
-number_of_search_results = 3
-
 # Load parameters from the agent provider
 default_provider_identifier = default_provider.get_provider_identifier()
 summary_provider_identifier = summary_provider.get_provider_identifier()
 
 default_identifier_str = str(default_provider_identifier).split(".")[-1]
 summary_identifier_str = str(summary_provider_identifier).split(".")[-1]
+
+# WebSearch settings
+tokens_per_summary = 3000
+tokens_search_results = 10000
+number_of_search_results = 3
 
 # Log startup information
 logging.info(

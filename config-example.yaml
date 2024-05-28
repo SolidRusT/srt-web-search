@@ -5,19 +5,19 @@ huggingface_api_key: '<some_key_here>'
 logs_path: 'logs'
 llms:
   default:
-    - name: 'Mistral Instruct'
-      type: Mistral
-      model: 'solidrust/Mistral-7B-instruct-v0.3-AWQ'
-      url: 'http://thanatos.hq.solidrust.net:8082/v1'
-      server: 'Thanatos'
-      max_tokens: 25000
+    name: 'Mistral Instruct'
+    type: Mistral
+    model: 'solidrust/Mistral-7B-instruct-v0.3-AWQ'
+    url: 'http://thanatos.hq.solidrust.net:8082/v1'
+    server: 'Thanatos'
+    max_tokens: 25000
   summary:
-    - name: 'Mistral Instruct'
-      type: Mistral
-      model: 'solidrust/Mistral-7B-instruct-v0.3-AWQ'
-      url: 'http://zelus.hq.solidrust.net:8083/v1'
-      server: 'Zelus'
-      max_tokens: 25000
+    name: 'Mistral Instruct'
+    type: Mistral
+    model: 'solidrust/Mistral-7B-instruct-v0.3-AWQ'
+    url: 'http://zelus.hq.solidrust.net:8083/v1'
+    server: 'Zelus'
+    max_tokens: 25000
 personas:
   # Assistants (gradio)
   Default:

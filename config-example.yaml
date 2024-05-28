@@ -1,33 +1,22 @@
-app_name: 'SolidRusT AI'
-website_url: 'https://solidrust.net'
-openai_api_key: '<some_key_here>'
-open_ai_model: 'gpt-3.5-turbo'
-mistral_api_key: '<some_key_here>'
-groq_api_key: '<some_key_here>'
+app_name: 'SolidRusT Web Search'
+website_url: 'https://search.solidrust.net'
+openai_compatible_api_key: '<some_key_here>'
 huggingface_api_key: '<some_key_here>'
-use_huggingface: True
 logs_path: 'logs'
-tgi_default_urls:
-  - name: 'Dolphin Mistral'
-    type: ChatML
-    model: 'solidrust/dolphin-2.6-mistral-7b-dpo-laser-AWQ'
-    url: 'http://erebus.hq.solidrust.net:8081/'
-    server: 'Erebus'
-    max_tokens: 4096
-vllm_default_urls:
+llm_url:
   - name: 'Mistral Instruct'
     type: Mistral
     model: 'solidrust/Mistral-7B-instruct-v0.3-AWQ'
     url: 'http://thanatos.hq.solidrust.net:8082/v1'
     server: 'Thanatos'
-    max_tokens: 16384
-llama_cpp_server_default_urls:
+    max_tokens: 25000
+summary_llm_url:
   - name: 'Mistral Instruct'
     type: Mistral
-    model: 'bartowski/Mistral-7B-Instruct-v0.3-GGUF'
-    url: 'http://hades.hq.solidrust.net:8084'
-    server: 'hades'
-    max_tokens: 16384
+    model: 'solidrust/Mistral-7B-instruct-v0.3-AWQ'
+    url: 'http://zelus.hq.solidrust.net:8083/v1'
+    server: 'Zelus'
+    max_tokens: 25000
 personas:
   # Assistants (gradio)
   Default:

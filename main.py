@@ -50,9 +50,14 @@ persona_preferences = config.preferences
 
 # Ensure configurations are loaded before accessing them in global scope
 model = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
-llm_url = "http://thanatos:8081/v1"
-llm_model_type = "Mistral"  # config.current_settings[0]["model_type"]
-llm_max_tokens = 16384  # config.current_settings[0]["max_tokens"]
+model_summary = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
+llm_url = "http://thanatos.hq.solidrust.net:8082/v1"
+llm_summary_url = "http://zelus.hq.solidrust.net:8083/v1"
+llm_embeddings_url = ""
+llm_model_type = "Mistral"          # config.current_settings[0]["model_type"]
+llm_model_type_summary = "Llama3"   # config.current_settings[0]["model_type"]
+llm_max_tokens = 16384              # config.current_settings[0]["max_tokens"]
+llm_max_tokens = 8182
 tokens_per_summary = 2048
 tokens_search_results = 8192
 number_of_search_results = 3
@@ -67,6 +72,12 @@ provider = VLLMServerProvider(
     base_url=llm_url,
     model=model,
     huggingface_model=model,
+)
+## vLLM Server provider for summary
+provider_summary = VLLMServerProvider(
+    base_url=llm_summary_url,
+    model=model_summary,
+    huggingface_model=model_summary,
 )
 ## CPP Python provider
 #llm = Llama(

@@ -49,33 +49,32 @@ persona_preferences = config.preferences
 
 # Ensure configurations are loaded before accessing them in global scope
 # Configure providers
+# Default provider
+llm_url = config.default_llm_url
+#llm_url = "http://thanatos.hq.solidrust.net:8082/v1"
+model = config.default_llm_model
+llm_model_type = config.default_llm_type
+llm_max_tokens = config.default_llm_max_tokens
 
+# Summary provider
+summary_llm_url = config.summary_llm_url
+#summary_llm_url = "http://zelus.hq.solidrust.net:8083/v1"
+summary_model = config.summary_llm_model
+summary_llm_model_type = config.summary_llm_type
+summary_llm_max_tokens = config.summary_llm_max_tokens
+
+# Provider specific settings
 ## CPP Server provider
 # provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
 # provider = LlamaCppServerProvider(llm_url)
 
-## vLLM Server provider
-llm_url = "http://thanatos.hq.solidrust.net:8082/v1"
-#llm_url = "http://thanatos:8081/v1"
-model = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
-llm_model_type = "Mistral"          # config.current_settings[0]["model_type"]
-llm_max_tokens = 25000 
+## vLLM Server Provider
 
 provider = VLLMServerProvider(
     base_url=llm_url,
     model=model,
     huggingface_model=model,
 )
-## vLLM Server provider for summary
-summary_llm_url = "http://zelus.hq.solidrust.net:8083/v1"
-#summary_llm_url = "http://zelus:8081/v1"
-summary_model = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
-summary_llm_model_type = "Mistral"
-summary_llm_max_tokens = 25000
-tokens_per_summary = 3000
-tokens_search_results = 10000
-number_of_search_results = 3
-
 summary_provider = VLLMServerProvider(
     base_url=summary_llm_url,
     model=summary_model,
@@ -95,6 +94,12 @@ llm_embeddings_url = ""
 #    )
 #provider = LlamaCppPythonProvider(llm)
 
+# WebSearch settings
+tokens_per_summary = 3000
+tokens_search_results = 10000
+number_of_search_results = 3
+
+# Load parameters from the agent provider
 provider_identifier = provider.get_provider_identifier()
 summary_provider_identifier = summary_provider.get_provider_identifier()
 

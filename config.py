@@ -16,6 +16,11 @@ class Config:
         self.server_port = int(os.environ.get("PORT", 8650))
         self.server_name = os.environ.get("SERVER_NAME", "0.0.0.0")
 
+        # Load provider configuration
+        self.default_llm_name = "Default"
+        self.summary_llm_name = "Summary"
+        self.load_provider_settings()
+
         # Load persona specific settings
         self.load_persona_settings()
 
@@ -24,13 +29,13 @@ class Config:
 
     def load_provider_settings(self):
         # Load default LLM from yaml config
-        default_llm = self.config["llms"]["default"]
+        default_llm = self.config["llms"][self.default_llm_name]
         self.default_llm_url = default_llm["url"]
         self.default_llm_type = default_llm["type"]
         self.default_llm_model = default_llm["model"]
         self.default_llm_max_tokens = default_llm["max_tokens"]
         # Load summary LLM from yaml config
-        summary_llm = self.config["llms"]["summary"]
+        summary_llm = self.config["llms"][self.summary_llm_name]
         self.summary_llm_url = summary_llm["url"]
         self.summary_llm_type = summary_llm["type"]
         self.summary_llm_model = summary_llm["model"]

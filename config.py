@@ -22,6 +22,21 @@ class Config:
         # Setup logging
         self.setup_logging()
 
+    def load_provider_settings(self):
+        # Load default LLM from yaml config
+        default_llm = self.config["llms"]["default"]
+        self.default_llm_url = default_llm["url"]
+        self.default_llm_type = default_llm["type"]
+        self.default_llm_model = default_llm["model"]
+        self.default_llm_max_tokens = default_llm["max_tokens"]
+        # Load summary LLM from yaml config
+        summary_llm = self.config["llms"]["summary"]
+        self.summary_llm_url = summary_llm["url"]
+        self.summary_llm_type = summary_llm["type"]
+        self.summary_llm_model = summary_llm["model"]
+        self.summary_llm_max_tokens = summary_llm["max_tokens"]
+
+
     def load_persona_settings(self):
         persona = self.config["personas"][self.persona_name]
         self.ui_theme = persona["theme"]

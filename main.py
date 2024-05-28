@@ -1,15 +1,15 @@
-# Defaults
+## App defaults
 import datetime
 import logging
 import gradio as gr
 
-# Locals
+## Local imports
 from config import config
 from messages import MessageHandler
 from content import css, PLACEHOLDER
 from utils import CitingSources
 
-# Agents
+## Agent Configuration
 from llama_cpp_agent import LlamaCppAgent
 from llama_cpp_agent.chat_history import BasicChatHistory
 from llama_cpp_agent.chat_history.messages import Roles
@@ -18,14 +18,14 @@ from llama_cpp_agent.llm_output_settings import (
     LlmStructuredOutputType,
 )
 
-# Tools
+## Agent Tools
 from llama_cpp_agent.tools import WebSearchTool
 from llama_cpp_agent.prompt_templates import (
     web_search_system_prompt,
     research_system_prompt,
 )
 
-## Configure providers dynamically
+## Agent Providers
 default_provider = config.default_provider
 summary_provider = config.summary_provider
 
@@ -34,14 +34,14 @@ default_provider_identifier = default_provider.get_provider_identifier()
 summary_provider_identifier = summary_provider.get_provider_identifier()
 
 default_identifier_str = str(default_provider_identifier).split(".")[-1]
-summary_identifier_str = str(summary_provider_identifier).split(".")[-1]
+#summary_identifier_str = str(summary_provider_identifier).split(".")[-1]  # unused
 
 # WebSearch settings
 tokens_per_summary = 4096
 tokens_search_results = 8192
 number_of_search_results = 3
 
-# Log startup information
+## Log startup information
 logging.info(
     f"""
     server: {config.server_name}:{config.server_port},
@@ -175,7 +175,7 @@ def respond(
     yield outputs
 
 
-# Begin Gradio UI
+## Begin Gradio UI
 main = gr.ChatInterface(
     respond,
     additional_inputs=[
@@ -239,5 +239,6 @@ main = gr.ChatInterface(
     ),
 )
 
+## Self execute when running from a CLI
 if __name__ == "__main__":
     main.launch(server_name=config.server_name, server_port=config.server_port)

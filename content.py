@@ -5,6 +5,11 @@ css = """
 .message-bubble-border {
     border-radius: 6px !important;
 }
+.message-buttons-bot, .message-buttons-user {
+    right: 10px !important;
+    left: auto !important;
+    bottom: 2px !important;
+}
 .dark.message-bubble-border {
     border-color: #1b0f0f !important;
 }
@@ -19,7 +24,7 @@ css = """
 PLACEHOLDER = """
 <div class="message-bubble-border" style="display:flex; max-width: 600px; border-width: 1px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); backdrop-filter: blur(10px);">
     <figure style="margin: 0;">
-        <img src="https://huggingface.co/spaces/poscye/ddg-web-search-chat/resolve/main/logo1.jpg" alt="Logo" style="width: 100%; height: 100%; border-radius: 8px;">
+        <img src="https://github.com/SolidRusT/srt-web-search/blob/main/logo.jpg?raw=true" alt="Logo" style="width: 100%; height: 100%; border-radius: 8px;">
     </figure>
     <div style="padding: .5rem 1.5rem;">
         <h2 style="text-align: left; font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">llama-cpp-agent</h2>

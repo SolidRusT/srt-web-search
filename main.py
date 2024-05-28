@@ -244,9 +244,11 @@ main = gr.ChatInterface(
         block_title_background_fill_dark="#1b0f0f",
         input_background_fill_dark="#140b0b",
         button_secondary_background_fill_dark="#140b0b",
+        border_color_accent_dark="#1b0f0f",
         border_color_primary_dark="#1b0f0f",
         background_fill_secondary_dark="#0c0505",
-        color_accent_soft_dark="transparent"
+        color_accent_soft_dark="transparent",
+        code_background_fill_dark="#140b0b"
     ),
     css=css,
     retry_btn="Retry",
@@ -256,7 +258,12 @@ main = gr.ChatInterface(
     examples=persona_topic_examples,
     analytics_enabled=False,
     description="Llama-cpp-agent: Chat Web Search Agent",
-    chatbot=gr.Chatbot(scale=1, placeholder=PLACEHOLDER),
+    chatbot=gr.Chatbot(
+        scale=1,
+        placeholder=PLACEHOLDER,
+        likeable=False,
+        show_copy_button=True
+    ),
 )
 
 if __name__ == "__main__":

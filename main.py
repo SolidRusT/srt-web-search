@@ -50,6 +50,7 @@ persona_preferences = config.preferences
 
 # Ensure configurations are loaded before accessing them in global scope
 model = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
+llm_url = "http://thanatos:8081/v1"
 llm_model_type = "Mistral"  # config.current_settings[0]["model_type"]
 llm_max_tokens = 16384  # config.current_settings[0]["max_tokens"]
 tokens_per_summary = 2048
@@ -57,14 +58,27 @@ tokens_search_results = 8192
 number_of_search_results = 3
 
 # Configure provider
-# provider = config.current_settings[1]
-# provider = LlamaCppServerProvider("http://hades:8084")
+
+## CPP Server provider
 # provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
+# provider = LlamaCppServerProvider(llm_url)
+## vLLM Server provider
 provider = VLLMServerProvider(
-    base_url="http://thanatos:8081/v1",
+    base_url=llm_url,
     model=model,
     huggingface_model=model,
 )
+## CPP Python provider
+#llm = Llama(
+#        model_path=f"models/{model_filename}",
+#        flash_attn=True,
+#        n_threads=40,
+#        n_gpu_layers=81,
+#        n_batch=1024,
+#        n_ctx=llm_max_tokens,
+#    )
+#provider = LlamaCppPythonProvider(llm)
+
 provider_identifier = provider.get_provider_identifier()
 identifier_str = str(provider_identifier).split(".")[-1]
 

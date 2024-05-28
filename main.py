@@ -15,7 +15,6 @@ from llama_cpp_agent.providers import (
     LlamaCppPythonProvider,
     VLLMServerProvider,
     TGIServerProvider,
-    LlamaCppPythonProvider,
 )
 from llama_cpp_agent import LlamaCppAgent
 from llama_cpp_agent.chat_history import BasicChatHistory
@@ -85,7 +84,7 @@ summary_provider = VLLMServerProvider(
 ## vLLM Embeddings Server provider
 llm_embeddings_url = ""
 
-## CPP Python provider
+## CPP Python providers
 #llm = Llama(
 #        model_path=f"models/{model_filename}",
 #        flash_attn=True,
@@ -97,17 +96,19 @@ llm_embeddings_url = ""
 #provider = LlamaCppPythonProvider(llm)
 
 provider_identifier = provider.get_provider_identifier()
+summary_provider_identifier = provider.get_provider_identifier()
+
 identifier_str = str(provider_identifier).split(".")[-1]
+summary_identifier_str = str(provider_identifier).split(".")[-1]
 
 # Log startup information
 logging.info(
     f"""
     server: {server_name}:{server_port},
-    model: {model},
-    model type: {llm_model_type},
-    model summary type: {summary_llm_model_type},
-    max tokens: {llm_max_tokens}, 
-    provider: {provider_identifier},
+    model: {model}, {summary_model},
+    model type: {llm_model_type}, {summary_llm_model_type},
+    max tokens: {llm_max_tokens}, {summary_llm_max_tokens}, 
+    providers: {provider_identifier}, {summary_provider_identifier},
     Loaded chat examples: {persona_topic_examples},
     """
 )

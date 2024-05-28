@@ -96,7 +96,7 @@ llm_embeddings_url = ""
 #provider = LlamaCppPythonProvider(llm)
 
 provider_identifier = provider.get_provider_identifier()
-summary_provider_identifier = provider.get_provider_identifier()
+summary_provider_identifier = summary_provider.get_provider_identifier()
 
 identifier_str = str(provider_identifier).split(".")[-1]
 summary_identifier_str = str(provider_identifier).split(".")[-1]

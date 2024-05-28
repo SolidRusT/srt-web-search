@@ -16,8 +16,8 @@ RUN apt update && apt install -y \
 RUN pip3 install --upgrade --no-cache-dir pip \
   && pip3 install --no-cache-dir wheel setuptools
 
-# Clone llama-cpp repository and install
-RUN git clone https://github.com/ggerganov/llama.cpp.git \
+  # Clone llama-cpp repository and install
+  RUN git clone https://github.com/ggerganov/llama.cpp.git \
   && cd llama.cpp \
   && mkdir build \
   && cd build \
@@ -25,8 +25,16 @@ RUN git clone https://github.com/ggerganov/llama.cpp.git \
   && make -j4 \
   && make install
 
-# Install app dependencies
+  # Install app dependencies
 RUN pip3 install --no-cache-dir -U -r requirements.txt
 
-# Run the App
+# Copy config-example.yaml to config.yaml if it doesn't exist
+RUN [ ! -f config.yaml ] && cp config-example.yaml config.yaml || :
+
+# Configure default service settings
+ENV PERSONA="Default"
+ENV PORT=8650
+ENV SERVER_NAME="0.0.0.0"
+
+# Run the service
 CMD ["python3", "main.py"]

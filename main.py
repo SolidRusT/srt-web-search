@@ -10,12 +10,6 @@ from content import css, PLACEHOLDER
 from utils import CitingSources
 
 # Agents
-from llama_cpp_agent.providers import (
-    LlamaCppServerProvider,
-    LlamaCppPythonProvider,
-    VLLMServerProvider,
-    TGIServerProvider,
-)
 from llama_cpp_agent import LlamaCppAgent
 from llama_cpp_agent.chat_history import BasicChatHistory
 from llama_cpp_agent.chat_history.messages import Roles
@@ -31,62 +25,9 @@ from llama_cpp_agent.prompt_templates import (
     research_system_prompt,
 )
 
-# Load UI Service settings from config module
-server_name = config.server_name
-server_port = config.server_port
-# load Persona settings from config module
-persona_app_title = config.app_title
-persona_name = config.persona_name
-persona_full_name = config.persona_full_name
-persona_description = config.description
-persona_avatar_image = config.persona_avatar_image
-persona_ui_theme = config.ui_theme
-persona_topic_examples = config.topic_examples
-persona_system_message = config.system_message
-persona_prompt_message = config.persona
-persona_temperature = config.temperature
-persona_preferences = config.preferences
-
-# Ensure configurations are loaded before accessing them in global scope
-# Configure providers
-# Default provider
-llm_model_type = config.default_llm_type
-llm_max_tokens = config.default_llm_max_tokens
-# Summary provider
-summary_llm_model_type = config.summary_llm_type
-summary_llm_max_tokens = config.summary_llm_max_tokens
-
-# Provider specific settings
-## CPP Server provider
-# provider = LlamaCppServerProvider(config.default_llm_url)
-# summary_provider = LlamaCppServerProvider(config.summary_llm_url)
-
-## CPP Python providers
-#llm = Llama(
-#        model_path=f"models/{model_filename}",
-#        flash_attn=True,
-#        n_threads=40,
-#        n_gpu_layers=81,
-#        n_batch=1024,
-#        n_ctx=llm_max_tokens,
-#    )
-#provider = LlamaCppPythonProvider(llm)
-
-## vLLM Server Provider
-provider = VLLMServerProvider(
-    base_url=config.default_llm_url,
-    model=config.default_llm_model,
-    huggingface_model=config.default_llm_model,
-)
-summary_provider = VLLMServerProvider(
-    base_url=config.summary_llm_url,
-    model=config.summary_llm_model,
-    huggingface_model=config.summary_llm_model,
-)
-
-## TGI Server Provider
-# provider = TGIServerProvider(config.default_llm_url)
-# summary_provider = TGIServerProvider(config.summary_llm_url)
+## Configure providers dynamically
+default_provider = config.default_provider
+summary_provider = config.default_provider
 
 # WebSearch settings
 tokens_per_summary = 3000
@@ -94,21 +35,21 @@ tokens_search_results = 10000
 number_of_search_results = 3
 
 # Load parameters from the agent provider
-provider_identifier = provider.get_provider_identifier()
+default_provider_identifier = default_provider.get_provider_identifier()
 summary_provider_identifier = summary_provider.get_provider_identifier()
 
-identifier_str = str(provider_identifier).split(".")[-1]
-summary_identifier_str = str(provider_identifier).split(".")[-1]
+default_identifier_str = str(default_provider_identifier).split(".")[-1]
+summary_identifier_str = str(summary_provider_identifier).split(".")[-1]
 
 # Log startup information
 logging.info(
     f"""
-    server: {server_name}:{server_port},
-    model: {model}, {summary_model},
-    model type: {llm_model_type}, {summary_llm_model_type},
-    max tokens: {llm_max_tokens}, {summary_llm_max_tokens}, 
-    providers: {provider_identifier}, {summary_provider_identifier},
-    Loaded chat examples: {persona_topic_examples},
+    server: {config.server_name}:{config.server_port},
+    model: {config.default_llm_huggingface}, {config.default_llm_huggingface},
+    model type: {config.default_llm_type}, {config.summary_llm_type},
+    max tokens: {config.default_llm_max_tokens}, {config.summary_llm_max_tokens}, 
+    providers: {default_provider_identifier}, {summary_provider_identifier},
+    Loaded chat examples: {config.persona_topic_examples},
     """
 )
 
@@ -125,14 +66,14 @@ def respond(
     repetition_penalty,
     model,
 ):
-    chat_template = MessageHandler.get_messages_formatter_type(llm_model_type)
-    summary_chat_template = MessageHandler.get_messages_formatter_type(summary_llm_model_type)
+    default_chat_template = MessageHandler.get_messages_formatter_type(config.default_llm_type)
+    summary_chat_template = MessageHandler.get_messages_formatter_type(config.summary_llm_type)
 
-    logging.info(f"Loaded chat examples: {chat_template}")
+    logging.info(f"Loaded chat examples: {default_chat_template}")
     search_tool = WebSearchTool(
-        llm_provider=provider,
-        message_formatter_type=chat_template,
-        model_max_context_tokens=llm_max_tokens,
+        llm_provider=default_provider,
+        message_formatter_type=default_chat_template,
+        model_max_context_tokens=config.default_llm_max_tokens,
         max_tokens_search_results=tokens_search_results,
         max_tokens_per_summary=tokens_per_summary,
         number_of_search_results=number_of_search_results,
@@ -146,32 +87,32 @@ def respond(
     )
 
     answer_agent = LlamaCppAgent(
-        provider=provider,
+        provider=default_provider,
         system_prompt=system_message,
-        predefined_messages_formatter_type=chat_template,
+        predefined_messages_formatter_type=default_chat_template,
         debug_output=False,
     )
 
-    settings = provider.get_provider_default_settings()
+    settings = default_provider.get_provider_default_settings()
     settings.stream = False
     settings.temperature = temperature
     settings.top_k = top_k
     settings.top_p = top_p
 
-    if "llama_cpp_server" in identifier_str:
+    if "llama_cpp_server" in default_identifier_str:
         settings.n_predict = max_tokens
         settings.repeat_penalty = repetition_penalty
-    elif "llama_cpp_python" in identifier_str:
+    elif "llama_cpp_python" in default_identifier_str:
         settings.n_predict = max_tokens
         settings.repeat_penalty = repetition_penalty
-    elif "tgi_server" in identifier_str:
+    elif "tgi_server" in default_identifier_str:
         settings.max_tokens = max_tokens
         settings.repetition_penalty = repetition_penalty
-    elif "vllm_server" in identifier_str:
+    elif "vllm_server" in default_identifier_str:
         settings.max_tokens = max_tokens
         settings.repetition_penalty = repetition_penalty
     else:
-        return "unsupported llama-cpp-agent provider:", identifier_str
+        return "unsupported llama-cpp-agent provider:", default_identifier_str
 
     output_settings = LlmStructuredOutputSettings.from_functions(
         [search_tool.get_tool()]
@@ -285,7 +226,7 @@ main = gr.ChatInterface(
     undo_btn="Undo",
     clear_btn="Clear",
     submit_btn="Send",
-    examples=persona_topic_examples,
+    examples=config.persona_topic_examples,
     analytics_enabled=False,
     description="Llama-cpp-agent: Chat Web Search Agent",
     chatbot=gr.Chatbot(
@@ -297,4 +238,4 @@ main = gr.ChatInterface(
 )
 
 if __name__ == "__main__":
-    main.launch(server_name=server_name, server_port=server_port)
+    main.launch(server_name=config.server_name, server_port=config.server_port)

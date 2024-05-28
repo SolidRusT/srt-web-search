@@ -27,7 +27,7 @@ from llama_cpp_agent.prompt_templates import (
 
 ## Configure providers dynamically
 default_provider = config.default_provider
-summary_provider = config.default_provider
+summary_provider = config.summary_provider
 
 # Load parameters from the agent provider
 default_provider_identifier = default_provider.get_provider_identifier()

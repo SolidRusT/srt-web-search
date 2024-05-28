@@ -207,17 +207,19 @@ Meta Llama-3 8B Instruct AWQ example.
 
 ```bash
 #export HF_TOKEN=<your_huggingface_token>
-model="microsoft/Phi-3-mini-128k-instruct"
-max_gpu=0.98
+model="solidrust/Meta-Llama-3-8B-Instruct-AWQ"
+max_gpu=0.95
 #max_model_len=65535
-max_model_len=40000
+max_model_len=8192
 local_port=8081
 
 docker run --runtime nvidia --gpus all -v ~/.cache/huggingface:/root/.cache/huggingface --env "HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}" -p $local_port:8000 --ipc=host \
   vllm/vllm-openai:latest \
-  --model $model --tokenizer $model --trust-remote-code --dtype half --kv-cache-dtype auto --gpu-memory-utilization $max_gpu --max-model-len $max_model_len --device auto --enforce-eager
+  --model $model --tokenizer $model --trust-remote-code --dtype auto --kv-cache-dtype auto --gpu-memory-utilization $max_gpu --max-model-len $max_model_len --device auto --enforce-eager
 ```
+
 or (broken)
+
 ```bash
 Zelus-AI$ python -m vllm.entrypoints.openai.api_server --model microsoft/Phi-3-mini-128k-instruct --dtype auto --max-model-len 65536 --device auto --gpu-memory-utilization 0.95 --enforce-eager --port 8081
 ```

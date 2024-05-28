@@ -49,22 +49,53 @@ persona_temperature = config.temperature
 persona_preferences = config.preferences
 
 # Ensure configurations are loaded before accessing them in global scope
+# Configure providers
+
+## CPP Server provider
+# provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
+# provider = LlamaCppServerProvider(llm_url)
+
+## vLLM Server provider
+llm_url = "http://thanatos.hq.solidrust.net:8082/v1"
+#llm_url = "http://thanatos:8081/v1"
 model = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
-llm_model_type = "Mistral"  # config.current_settings[0]["model_type"]
-llm_max_tokens = 16384  # config.current_settings[0]["max_tokens"]
+llm_model_type = "Mistral"          # config.current_settings[0]["model_type"]
+llm_max_tokens = 16384 
+
+provider = VLLMServerProvider(
+    base_url=llm_url,
+    model=model,
+    huggingface_model=model,
+)
+## vLLM Server provider for summary
+llm_summary_url = "http://zelus.hq.solidrust.net:8083/v1"
+#llm_summary_url = "http://zelus:8081/v1"
+model_summary = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
+llm_model_summary_type = "Llama3"
+llm_summary_max_tokens = 8182
 tokens_per_summary = 2048
 tokens_search_results = 8192
 number_of_search_results = 3
 
-# Configure provider
-# provider = config.current_settings[1]
-# provider = LlamaCppServerProvider("http://hades:8084")
-# provider = LlamaCppServerProvider("http://hades.hq.solidrust.net:8084")
-provider = VLLMServerProvider(
-    base_url="http://thanatos:8081/v1",
-    model=model,
-    huggingface_model=model,
+provider_summary = VLLMServerProvider(
+    base_url=llm_summary_url,
+    model=model_summary,
+    huggingface_model=model_summary,
 )
+## vLLM Embeddings Server provider
+llm_embeddings_url = ""
+
+## CPP Python provider
+#llm = Llama(
+#        model_path=f"models/{model_filename}",
+#        flash_attn=True,
+#        n_threads=40,
+#        n_gpu_layers=81,
+#        n_batch=1024,
+#        n_ctx=llm_max_tokens,
+#    )
+#provider = LlamaCppPythonProvider(llm)
+
 provider_identifier = provider.get_provider_identifier()
 identifier_str = str(provider_identifier).split(".")[-1]
 
@@ -74,6 +105,7 @@ logging.info(
     server: {server_name}:{server_port},
     model: {model},
     model type: {llm_model_type},
+    model summary type: {llm_model_summary_type},
     max tokens: {llm_max_tokens}, 
     provider: {provider_identifier},
     Loaded chat examples: {persona_topic_examples},
@@ -94,25 +126,23 @@ def respond(
     model,
 ):
     chat_template = MessageHandler.get_messages_formatter_type(llm_model_type)
+    chat_template_summary = MessageHandler.get_messages_formatter_type(llm_model_summary_type)
 
     logging.info(f"Loaded chat examples: {chat_template}")
     search_tool = WebSearchTool(
-        llm_provider=provider,
+        llm_provider=model,
         message_formatter_type=chat_template,
         model_max_context_tokens=llm_max_tokens,
         max_tokens_search_results=tokens_search_results,
         max_tokens_per_summary=tokens_per_summary,
         number_of_search_results=number_of_search_results,
-        ## WebSearchTool defaults (llama-cpp-agent-0.2.20)
-        #temperature=0.45, top_p=0.95, top_k=40,
-        #web_crawler=WebCrawler, web_search_provider=WebSearchProvider,
     )
 
     web_search_agent = LlamaCppAgent(
         provider,
         system_prompt=web_search_system_prompt,
         predefined_messages_formatter_type=chat_template,
-        debug_output=True,
+        debug_output=False,
     )
 
     answer_agent = LlamaCppAgent(

@@ -51,6 +51,7 @@ class Config:
         if "llama_cpp_server" in self.summary_llm_agent_provider:
           from llama_cpp_agent.providers import LlamaCppServerProvider
           self.default_provider = LlamaCppServerProvider(self.default_llm_url)
+          self.summary_provider = LlamaCppServerProvider(self.summary_llm_url)
         elif "llama_cpp_python" in self.summary_llm_agent_provider:
           from llama_cpp import Llama
           from llama_cpp_agent.providers import LlamaCppPythonProvider
@@ -65,9 +66,11 @@ class Config:
             n_ctx=self.default_llm_max_tokens,
           )
           self.default_provider = LlamaCppPythonProvider(python_cpp_llm)
+          self.summary_provider = LlamaCppPythonProvider(python_cpp_llm)
         elif "tgi_server" in self.summary_llm_agent_provider:
           from llama_cpp_agent.providers import TGIServerProvider
           self.default_provider = TGIServerProvider(self.default_llm_url)
+          self.summary_provider = TGIServerProvider(self.summary_llm_url)
         elif "vllm_server" in self.summary_llm_agent_provider:
           from llama_cpp_agent.providers import VLLMServerProvider
           self.default_provider = VLLMServerProvider(
@@ -76,9 +79,16 @@ class Config:
             huggingface_model=self.default_llm_huggingface,
             #api_key
           )
+          self.summary_provider = VLLMServerProvider(
+            base_url=self.summary_llm_url,
+            model=self.summary_llm_huggingface,
+            huggingface_model=self.summary_llm_huggingface,
+            #api_key
+          )
         else:
           self.default_provider = "unsupported"
-          return "unsupported llama-cpp-agent provider:", self.summary_llm_agent_provider
+          self.summary_provider = "unsupported"
+          return "unsupported llama-cpp-agent provider:", self.default_llm_agent_provider, self.summary_llm_agent_provider
 
 
     def load_persona_settings(self):

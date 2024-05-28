@@ -53,7 +53,7 @@ deactivate
 Configure a `config.yaml` file, then make a docker image with it.
 
 ```bash
-docker build -t solidrust/srt-web-search -f Dockerfile .
+docker build --progress=plain -t solidrust/srt-web-search -f Dockerfile .
 ```
 
 Run the new image.

@@ -16,8 +16,9 @@ RUN apt update && apt install -y \
 RUN pip3 install --upgrade --no-cache-dir pip \
   && pip3 install --no-cache-dir wheel setuptools
 
-  # Clone llama-cpp repository and install
-  RUN git clone https://github.com/ggerganov/llama.cpp.git \
+## Just for Llama CPP Python provider dependency
+# Clone llama-cpp repository and install
+RUN git clone https://github.com/ggerganov/llama.cpp.git \
   && cd llama.cpp \
   && mkdir build \
   && cd build \
@@ -25,11 +26,16 @@ RUN pip3 install --upgrade --no-cache-dir pip \
   && make -j4 \
   && make install
 
-  # Install app dependencies
+# Install app dependencies
 RUN pip3 install --no-cache-dir -U -r requirements.txt
 
 # Copy config-example.yaml to config.yaml if it doesn't exist
-RUN [ ! -f config.yaml ] && cp config-example.yaml config.yaml || :
+RUN if [ ! -f config.yaml ]; then \
+      cp config-example.yaml config.yaml && \
+      echo "Default configuration file created: config.yaml"; \
+    else \
+      echo "Configuration file found: config.yaml"; \
+    fi
 
 # Configure default service settings
 ENV PERSONA="Default"

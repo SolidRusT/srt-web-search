@@ -35,23 +35,7 @@ deactivate
 
 Copy the `config-example.yaml` to `config.yaml`, and update it with your own parameter values.
 
-Set your CPP Agent provider and model in `main.py`.
-
-```python
-from llama_cpp_agent.providers import VLLMServerProvider
-
-model = "solidrust/Mistral-7B-instruct-v0.3-AWQ"
-llm_model_type = "Mistral"  # config.current_settings[0]["model_type"]
-llm_max_tokens = 16384  # config.current_settings[0]["max_tokens"]
-tokens_per_summary = 2048
-tokens_search_results = 8192
-
-provider = VLLMServerProvider(
-    base_url="http://localhost:8000/v1",
-    model=model,
-    huggingface_model=model,
-)
-```
+Set your CPP Agent provider and model in `config.yaml`.
 
 ## Running Web Search UI
 
@@ -69,19 +53,21 @@ deactivate
 Configure the app, then make a docker image of it.
 
 ```bash
-#export HF_TOKEN=<your_huggingface_token>
-#export OPENAI_API_KEY=<your_local_openai_compatible_key>
 docker build -t solidrust/srt-web-search -f Dockerfile .
 ```
 
 Run the new image.
 
 ```bash
+export HF_TOKEN=<your_huggingface_token>
+export OPENAI_API_KEY=<your_local_openai_compatible_key>
+export SERVICE_PORT=8650
+
 docker run \
   -v ~/.cache/huggingface:/root/.cache/huggingface \
   --env "HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}" \
   --env "OPENAI_API_KEY=${OPENAI_API_KEY}" \
-  -p 8650:8650 \
+  -p ${SERVICE_PORT}:8650 \
   --ipc=host \
-  solidrust/srt-web-search
+  solidrust/srt-web-search:latest
 ```

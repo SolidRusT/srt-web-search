@@ -37,8 +37,8 @@ default_identifier_str = str(default_provider_identifier).split(".")[-1]
 summary_identifier_str = str(summary_provider_identifier).split(".")[-1]
 
 # WebSearch settings
-tokens_per_summary = 3000
-tokens_search_results = 10000
+tokens_per_summary = 4096
+tokens_search_results = 8192
 number_of_search_results = 3
 
 # Log startup information
@@ -66,8 +66,12 @@ def respond(
     repetition_penalty,
     model,
 ):
-    default_chat_template = MessageHandler.get_messages_formatter_type(config.default_llm_type)
-    summary_chat_template = MessageHandler.get_messages_formatter_type(config.summary_llm_type)
+    default_chat_template = MessageHandler.get_messages_formatter_type(
+        config.default_llm_type
+    )
+    summary_chat_template = MessageHandler.get_messages_formatter_type(
+        config.summary_llm_type
+    )
 
     logging.info(f"Loaded chat examples: {default_chat_template}")
     search_tool = WebSearchTool(
@@ -80,7 +84,7 @@ def respond(
     )
 
     web_search_agent = LlamaCppAgent(
-        provider=summary_provider, # provider, summary_provider
+        provider=summary_provider,  # provider, summary_provider
         system_prompt=web_search_system_prompt,
         predefined_messages_formatter_type=summary_chat_template,  # chat_template, summary_chat_template
         debug_output=False,
@@ -127,7 +131,8 @@ def respond(
         messages.add_message(assistant)
 
     result = web_search_agent.get_chat_response(
-        f"Current Date and Time(d/m/y, h:m:s): {datetime.datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}\n\nUser Query: " + message,
+        f"Current Date and Time(d/m/y, h:m:s): {datetime.datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}\n\nUser Query: "
+        + message,
         llm_sampling_settings=settings,
         structured_output_settings=output_settings,
         add_message_to_chat_history=False,
@@ -219,7 +224,7 @@ main = gr.ChatInterface(
         border_color_primary_dark="#1b0f0f",
         background_fill_secondary_dark="#0c0505",
         color_accent_soft_dark="transparent",
-        code_background_fill_dark="#140b0b"
+        code_background_fill_dark="#140b0b",
     ),
     css=css,
     retry_btn="Retry",
@@ -230,10 +235,7 @@ main = gr.ChatInterface(
     analytics_enabled=False,
     description="Llama-cpp-agent: Chat Web Search Agent",
     chatbot=gr.Chatbot(
-        scale=1,
-        placeholder=PLACEHOLDER,
-        likeable=False,
-        show_copy_button=True
+        scale=1, placeholder=PLACEHOLDER, likeable=False, show_copy_button=True
     ),
 )
 

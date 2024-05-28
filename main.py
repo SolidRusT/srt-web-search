@@ -55,7 +55,7 @@ llm_url = "http://thanatos.hq.solidrust.net:8082/v1"
 llm_summary_url = "http://zelus.hq.solidrust.net:8083/v1"
 llm_embeddings_url = ""
 llm_model_type = "Mistral"          # config.current_settings[0]["model_type"]
-llm_model_type_summary = "Llama3"   # config.current_settings[0]["model_type"]
+llm_model_summary_type = "Llama3"   # config.current_settings[0]["model_type"]
 llm_max_tokens = 16384              # config.current_settings[0]["max_tokens"]
 llm_max_tokens = 8182
 tokens_per_summary = 2048
@@ -99,6 +99,7 @@ logging.info(
     server: {server_name}:{server_port},
     model: {model},
     model type: {llm_model_type},
+    model summary type: {llm_model_summary_type},
     max tokens: {llm_max_tokens}, 
     provider: {provider_identifier},
     Loaded chat examples: {persona_topic_examples},

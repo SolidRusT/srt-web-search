@@ -2,7 +2,7 @@
 import logging
 import argparse
 import gradio as gr
-from app.config import config
+from config import config
 from app.content import css, PLACEHOLDER
 from agents.chat_agent import chat_response
 from agents.web_search_agent import web_search_response
@@ -20,6 +20,7 @@ logging.info(
     """
 )
 
+
 ## Gradio UI setup
 def setup_gradio_interface(response_function, system_message):
     return gr.ChatInterface(
@@ -27,16 +28,29 @@ def setup_gradio_interface(response_function, system_message):
         additional_inputs=[
             gr.Textbox(value=system_message, label="System message", interactive=True),
             gr.Slider(minimum=1, maximum=4096, value=2048, step=1, label="Max tokens"),
-            gr.Slider(minimum=0.1, maximum=4.0, value=0.7, step=0.1, label="Temperature"),
+            gr.Slider(
+                minimum=0.1, maximum=4.0, value=0.7, step=0.1, label="Temperature"
+            ),
             gr.Slider(minimum=0.1, maximum=1.0, value=0.95, step=0.05, label="Top-p"),
             gr.Slider(minimum=0, maximum=100, value=40, step=1, label="Top-k"),
-            gr.Slider(minimum=0.0, maximum=2.0, value=1.1, step=0.1, label="Repetition penalty"),
+            gr.Slider(
+                minimum=0.0,
+                maximum=2.0,
+                value=1.1,
+                step=0.1,
+                label="Repetition penalty",
+            ),
         ],
         theme=gr.themes.Soft(
             primary_hue="orange",
             secondary_hue="amber",
             neutral_hue="gray",
-            font=[gr.themes.GoogleFont("Exo"), "ui-sans-serif", "system-ui", "sans-serif"]
+            font=[
+                gr.themes.GoogleFont("Exo"),
+                "ui-sans-serif",
+                "system-ui",
+                "sans-serif",
+            ],
         ).set(
             body_background_fill_dark="#0c0505",
             block_background_fill_dark="#0c0505",
@@ -58,20 +72,33 @@ def setup_gradio_interface(response_function, system_message):
         examples=config.persona_topic_examples,
         analytics_enabled=False,
         description="Llama-cpp-agent Interface",
-        chatbot=gr.Chatbot(scale=1, placeholder=PLACEHOLDER, likeable=False, show_copy_button=True),
+        chatbot=gr.Chatbot(
+            scale=1, placeholder=PLACEHOLDER, likeable=False, show_copy_button=True
+        ),
     )
+
 
 ## Self execute when running from a CLI
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run Llama-cpp-agent.")
-    parser.add_argument('--mode', choices=['chat', 'web_search'], required=True, help="Mode to run the application in")
+    parser.add_argument(
+        "--mode",
+        choices=["chat", "web_search"],
+        required=True,
+        help="Mode to run the application in",
+    )
     args = parser.parse_args()
 
     port = config.server_port
 
     if args.mode == "chat":
-        gradio_interface = setup_gradio_interface(chat_response, f"{config.persona_system_message} {config.persona_prompt_message}")
+        gradio_interface = setup_gradio_interface(
+            chat_response,
+            f"{config.persona_system_message} {config.persona_prompt_message}",
+        )
     elif args.mode == "web_search":
-        gradio_interface = setup_gradio_interface(web_search_response, research_system_prompt)
+        gradio_interface = setup_gradio_interface(
+            web_search_response, research_system_prompt
+        )
 
     gradio_interface.launch(server_name=config.server_name, server_port=port)

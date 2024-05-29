@@ -1,14 +1,15 @@
 import json
-import time
 from typing import List
 from datetime import datetime, timezone
 
 from pydantic import BaseModel, Field
 from trafilatura import fetch_url, extract
 
+
 def get_server_time():
     utc_time = datetime.now(timezone.utc)
     return utc_time.strftime("%Y-%m-%d %H:%M:%S")
+
 
 def get_website_content_from_url(url: str) -> str:
     """
@@ -22,7 +23,13 @@ def get_website_content_from_url(url: str) -> str:
     try:
         downloaded = fetch_url(url)
 
-        result = extract(downloaded, include_formatting=True, include_links=True, output_format='json', url=url)
+        result = extract(
+            downloaded,
+            include_formatting=True,
+            include_links=True,
+            output_format="json",
+            url=url,
+        )
 
         if result:
             result = json.loads(result)
@@ -33,11 +40,12 @@ def get_website_content_from_url(url: str) -> str:
         return f"An error occurred: {str(e)}"
 
 
-
 class CitingSources(BaseModel):
     """
     This represents the citing of the sources you used to answer the user query.
     """
-    sources: List[str] = Field(...,
-                               description="List of sources to cite. Should be an URL of the source. E.g. GitHub URL, Blogpost URL or Newsletter URL.")
 
+    sources: List[str] = Field(
+        ...,
+        description="List of sources to cite. Should be an URL of the source. E.g. GitHub URL, Blogpost URL or Newsletter URL.",
+    )

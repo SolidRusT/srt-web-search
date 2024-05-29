@@ -1,15 +1,8 @@
-import datetime
 import logging
-from app.utils import CitingSources
 from app.config import config
 from app.messages import MessageHandler
 from llama_cpp_agent import LlamaCppAgent
-from llama_cpp_agent.chat_history import BasicChatHistory
-from llama_cpp_agent.chat_history.messages import Roles
-from llama_cpp_agent.llm_output_settings import LlmStructuredOutputSettings, LlmStructuredOutputType
-from llama_cpp_agent.prompt_templates import web_search_system_prompt
 from ragatouille.utils import get_wikipedia_page
-from llama_cpp_agent.messages_formatter import MessagesFormatterType
 from llama_cpp_agent.rag.rag_colbert_reranker import RAGColbertReranker
 from llama_cpp_agent.text_utils import RecursiveCharacterTextSplitter
 
@@ -32,7 +25,6 @@ def wikipedia_response(message, history, system_message, max_tokens, temperature
         vector_store.add_document(split)
 
     default_chat_template = MessageHandler.get_messages_formatter_type(config.default_llm_type)
-    summary_chat_template = MessageHandler.get_messages_formatter_type(config.summary_llm_type)
     default_agent_provider = config.default_llm_agent_provider
     
     logging.info(f"Loaded chat template: {default_chat_template}")

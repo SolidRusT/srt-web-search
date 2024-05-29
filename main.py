@@ -4,8 +4,8 @@ import argparse
 import gradio as gr
 from app.config import config
 from app.content import css, PLACEHOLDER
-from chat_agent import chat_response
-from web_search_agent import web_search_response
+from agents.chat_agent import chat_response
+from agents.web_search_agent import web_search_response
 from llama_cpp_agent.prompt_templates import research_system_prompt
 
 ## Log startup information

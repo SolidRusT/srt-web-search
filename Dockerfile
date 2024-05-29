@@ -43,4 +43,4 @@ ENV PORT=8650
 ENV SERVER_NAME="0.0.0.0"
 
 # Run the service
-CMD ["python3", "main.py", "--mode", "chat"]
+CMD ["python3", "main.py", "--mode", "chat", "--interface", "gradio"]

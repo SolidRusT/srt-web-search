@@ -11,3 +11,4 @@ transformers
 sentencepiece
 protobuf
 bs4
+streamlit

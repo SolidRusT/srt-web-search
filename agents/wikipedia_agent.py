@@ -37,7 +37,7 @@ def wikipedia_response(message, history, system_message, max_tokens, temperature
     )
 
     settings = config.default_provider.get_provider_default_settings()
-    settings.stream = True
+    settings.stream = False
     settings.temperature = temperature
     settings.top_k = top_k
     settings.top_p = top_p
@@ -67,8 +67,10 @@ def wikipedia_response(message, history, system_message, max_tokens, temperature
 
     # Use the agent with RAG information to generate a response
     response_text = agent_with_rag_information.get_chat_response(prompt)
-
-    outputs = ""
-    for text in response_text:
-        outputs += text
-        yield outputs
+ 
+    yield response_text
+    
+    #outputs = ""
+    #for text in response_text:
+    #    outputs += text
+    #    yield outputs

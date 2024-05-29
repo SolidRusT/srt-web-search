@@ -66,9 +66,7 @@ export DOCKER_IMAGE="solidrust/srt-web-search:latest"
 export PERSONA=Default
 
 # Available modes: chat, web_search
-export RUN_COMMAND="python3 main.py --mode web_search"
 # The 'web_search' mode will ignore persona system prompts
-
 docker run \
   -v ~/.cache/huggingface:/root/.cache/huggingface \
   --env "HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}" \
@@ -77,5 +75,5 @@ docker run \
   --env "RUN_COMMAND=${RUN_COMMAND}" \
   -p ${LOCAL_SERVICE_PORT}:8650 \
   --ipc=host \
-  ${DOCKER_IMAGE} ${RUN_COMMAND}
+  ${DOCKER_IMAGE} python3 main.py --mode web_search
 ```

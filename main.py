@@ -1,5 +1,6 @@
 ## App defaults
 import logging
+import argparse
 import gradio as gr
 from app.config import config
 from app.content import css, PLACEHOLDER
@@ -62,14 +63,15 @@ def setup_gradio_interface(response_function, system_message):
 
 ## Self execute when running from a CLI
 if __name__ == "__main__":
-    mode = input("Choose mode (chat/web_search): ").strip().lower()
+    parser = argparse.ArgumentParser(description="Run Llama-cpp-agent.")
+    parser.add_argument('--mode', choices=['chat', 'web_search'], required=True, help="Mode to run the application in")
+    args = parser.parse_args()
+
     port = config.server_port
 
-    if mode == "chat":
+    if args.mode == "chat":
         gradio_interface = setup_gradio_interface(chat_response, f"{config.persona_system_message} {config.persona_prompt_message}")
-    elif mode == "web_search":
+    elif args.mode == "web_search":
         gradio_interface = setup_gradio_interface(web_search_response, research_system_prompt)
-    else:
-        raise ValueError("Invalid mode selected. Choose either 'chat' or 'web_search'.")
 
     gradio_interface.launch(server_name=config.server_name, server_port=port)

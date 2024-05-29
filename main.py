@@ -8,6 +8,9 @@ from agents.chat_agent import chat_response
 from agents.web_search_agent import web_search_response
 from llama_cpp_agent.prompt_templates import research_system_prompt
 
+# Streamlit imports
+import streamlit as st
+
 ## Log startup information
 logging.info(
     f"""
@@ -77,6 +80,37 @@ def setup_gradio_interface(response_function, system_message):
         ),
     )
 
+def setup_streamlit_interface(response_function, system_message):
+    st.title("Llama-cpp-agent Interface")
+    st.write(system_message)
+
+    user_input = st.text_input("Your message:", "")
+    max_tokens = st.slider("Max tokens", 1, 4096, 2048)
+    temperature = st.slider("Temperature", 0.1, 4.0, 0.7)
+    top_p = st.slider("Top-p", 0.1, 1.0, 0.95)
+    top_k = st.slider("Top-k", 0, 100, 40)
+    repetition_penalty = st.slider("Repetition penalty", 0.0, 2.0, 1.1)
+
+    if st.button("Send"):
+        history = []
+        output = response_function(
+            message=user_input,
+            history=history,
+            system_message=system_message,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            top_p=top_p,
+            top_k=top_k,
+            repetition_penalty=repetition_penalty,
+            model=config.default_llm_huggingface
+        )
+        for text in output:
+            st.write(text)
+
+
+def setup_custom_interface(response_function, system_message):
+    # Implement your custom interface logic here
+    print("Custom interface is not implemented yet.")
 
 ## Self execute when running from a CLI
 if __name__ == "__main__":
@@ -87,18 +121,27 @@ if __name__ == "__main__":
         required=True,
         help="Mode to run the application in",
     )
+    parser.add_argument(
+        "--interface",
+        choices=["gradio", "streamlit", "custom"],
+        required=True,
+        help="Interface to run the application with",
+    )
     args = parser.parse_args()
 
     port = config.server_port
 
     if args.mode == "chat":
-        gradio_interface = setup_gradio_interface(
-            chat_response,
-            f"{config.persona_system_message} {config.persona_prompt_message}",
-        )
+        response_function = chat_response
+        system_message = f"{config.persona_system_message} {config.persona_prompt_message}"
     elif args.mode == "web_search":
-        gradio_interface = setup_gradio_interface(
-            web_search_response, research_system_prompt
-        )
+        response_function = web_search_response
+        system_message = research_system_prompt
 
-    gradio_interface.launch(server_name=config.server_name, server_port=port)
+    if args.interface == "gradio":
+        gradio_interface = setup_gradio_interface(response_function, system_message)
+        gradio_interface.launch(server_name=config.server_name, server_port=port)
+    elif args.interface == "streamlit":
+        setup_streamlit_interface(response_function, system_message)
+    elif args.interface == "custom":
+        setup_custom_interface(response_function, system_message)

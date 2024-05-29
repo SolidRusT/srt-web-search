@@ -15,7 +15,7 @@ llms:
     url: 'http://erebus.hq.solidrust.net:8081'
     agent_provider: 'tgi_server'
     server: 'Erebus'
-    max_tokens: 4096
+    max_tokens: 8192
   summary:
     name: 'summary'
     type: ChatML
@@ -24,7 +24,7 @@ llms:
     url: 'http://erebus.hq.solidrust.net:8081'
     agent_provider: 'tgi_server'
     server: 'Erebus'
-    max_tokens: 4096
+    max_tokens: 8192
 personas:
   # Assistants (gradio)
   Default:

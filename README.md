@@ -64,8 +64,8 @@ export OPENAI_API_KEY=${OPENAI_API_KEY}
 export LOCAL_SERVICE_PORT=8650
 export DOCKER_IMAGE="solidrust/srt-web-search:latest"
 export PERSONA=Default
-
-# Available modes: chat, web_search
+export CLIENT_MODE="web_search"
+# Available client_modes: chat, web_search
 # The 'web_search' mode will ignore persona system prompts
 docker run \
   -v ~/.cache/huggingface:/root/.cache/huggingface \
@@ -75,5 +75,5 @@ docker run \
   --env "RUN_COMMAND=${RUN_COMMAND}" \
   -p ${LOCAL_SERVICE_PORT}:8650 \
   --ipc=host \
-  ${DOCKER_IMAGE} python3 main.py --mode web_search
+  ${DOCKER_IMAGE} python3 main.py --mode ${CLIENT_MODE}
 ```

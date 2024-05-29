@@ -199,6 +199,7 @@ main = gr.ChatInterface(
             label="Repetition penalty",
         ),
     ],
+    # TODO: gradio theme toggle: https://github.com/SolidRusT/srt-web-search/commit/c5147aefbed1a5111ae61a8341819b28b683e10e
     theme=gr.themes.Soft(
         primary_hue="orange",
         secondary_hue="amber",

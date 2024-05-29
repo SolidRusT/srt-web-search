@@ -34,6 +34,7 @@ RUN if [ ! -f config.yaml ]; then \
       cp config-example.yaml config.yaml && \
       echo "Default configuration file created: config.yaml"; \
     else \
+      cp config.yaml config.yaml \
       echo "Configuration file found: config.yaml"; \
     fi
 
@@ -43,4 +44,4 @@ ENV PORT=8650
 ENV SERVER_NAME="0.0.0.0"
 
 # Run the service
-CMD ["python3", "main.py"]
+CMD ["python3", "main.py", "--mode", "chat"]

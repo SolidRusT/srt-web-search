@@ -6,6 +6,7 @@ from app.config import config
 from app.content import css, PLACEHOLDER
 from agents.chat_agent import chat_response
 from agents.web_search_agent import web_search_response
+from agents.wikipedia_agent import wikipedia_response
 from llama_cpp_agent.prompt_templates import research_system_prompt
 
 ## Log startup information
@@ -116,7 +117,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run Llama-cpp-agent.")
     parser.add_argument(
         "--mode",
-        choices=["chat", "web_search"],
+        choices=["chat", "web_search", "wikipedia"],
         required=True,
         help="Mode to run the application in",
     )
@@ -135,6 +136,9 @@ if __name__ == "__main__":
         system_message = f"{config.persona_system_message} {config.persona_prompt_message}"
     elif args.mode == "web_search":
         response_function = web_search_response
+        system_message = research_system_prompt
+    elif args.mode == "wikipedia":
+        response_function = wikipedia_response
         system_message = research_system_prompt
 
     if args.interface == "gradio":

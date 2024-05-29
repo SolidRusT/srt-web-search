@@ -15,6 +15,7 @@ from llama_cpp_agent.text_utils import RecursiveCharacterTextSplitter
 
 def wikipedia_response(message, history, system_message, max_tokens, temperature, top_p, top_k, repetition_penalty, model):
     page = get_wikipedia_page(message)
+    system_message = f"You are an advanced AI assistant, trained by SolidRusT Networks."
     vector_store = RAGColbertReranker(persistent=False)
     length_function = len
     splitter = RecursiveCharacterTextSplitter(

@@ -34,7 +34,6 @@ RUN if [ ! -f config.yaml ]; then \
       cp config-example.yaml config.yaml && \
       echo "Default configuration file created: config.yaml"; \
     else \
-      cp config.yaml config.yaml \
       echo "Configuration file found: config.yaml"; \
     fi
 

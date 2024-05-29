@@ -6,7 +6,7 @@ from llama_cpp_agent import LlamaCppAgent
 from llama_cpp_agent.chat_history import BasicChatHistory
 from llama_cpp_agent.chat_history.messages import Roles
 
-def chat_response(message, history, system_message, max_tokens, temperature, top_p, top_k, repetition_penalty, model):
+async def chat_response(message, history, system_message, max_tokens, temperature, top_p, top_k, repetition_penalty, model):
     chat_template = MessageHandler.get_messages_formatter_type(config.default_llm_type)
     model = config.default_llm_huggingface
     system_message = f"{config.persona_system_message} {config.persona_prompt_message}"
@@ -17,7 +17,7 @@ def chat_response(message, history, system_message, max_tokens, temperature, top
         predefined_messages_formatter_type=chat_template,
         debug_output=False,
     )
-    
+    default_agent_provider = config.default_llm_agent_provider
     logging.info(f"Loaded chat template: {chat_template}")
     
     settings = config.default_provider.get_provider_default_settings()
@@ -26,20 +26,20 @@ def chat_response(message, history, system_message, max_tokens, temperature, top
     settings.top_k = top_k
     settings.top_p = top_p
 
-    if "llama_cpp_server" in model:
+    if "llama_cpp_server" in default_agent_provider:
         settings.n_predict = max_tokens
         settings.repeat_penalty = repetition_penalty
-    elif "llama_cpp_python" in model:
+    elif "llama_cpp_python" in default_agent_provider:
         settings.n_predict = max_tokens
         settings.repeat_penalty = repetition_penalty
-    elif "tgi_server" in model:
+    elif "tgi_server" in default_agent_provider:
         settings.max_tokens = max_tokens
         settings.repetition_penalty = repetition_penalty
-    elif "vllm_server" in model:
+    elif "vllm_server" in default_agent_provider:
         settings.max_tokens = max_tokens
         settings.repetition_penalty = repetition_penalty
     else:
-        return "unsupported llama-cpp-agent provider:", model
+        return "unsupported llama-cpp-agent provider:", default_agent_provider
     
     messages = BasicChatHistory()
     for msn in history:

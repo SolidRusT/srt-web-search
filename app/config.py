@@ -51,13 +51,11 @@ class Config:
         # Provider specific settings
         if "llama_cpp_server" in self.summary_llm_agent_provider:
             from llama_cpp_agent.providers import LlamaCppServerProvider
-
             self.default_provider = LlamaCppServerProvider(self.default_llm_url)
             self.summary_provider = LlamaCppServerProvider(self.summary_llm_url)
         elif "llama_cpp_python" in self.summary_llm_agent_provider:
             from llama_cpp import Llama
             from llama_cpp_agent.providers import LlamaCppPythonProvider
-
             # TODO: add HF download logic here
             # hf download {huggingface} {filename}
             python_cpp_llm = Llama(
@@ -75,6 +73,15 @@ class Config:
 
             self.default_provider = TGIServerProvider(self.default_llm_url)
             self.summary_provider = TGIServerProvider(self.summary_llm_url)
+            
+            self.default_provider = TGIServerProvider(
+                server_address=self.default_llm_url,
+                # api_key
+            )
+            self.summary_provider = TGIServerProvider(
+                server_address=self.default_llm_url,
+                # api_key
+            )
         elif "vllm_server" in self.summary_llm_agent_provider:
             from llama_cpp_agent.providers import VLLMServerProvider
 

@@ -9,18 +9,18 @@ number_of_search_results: 3
 llms:
   default:
     name: 'default'
-    type: ChatML
-    filename: 'fc-dolphin-2.6-mistral-7b-dpo-laser-AWQ'
-    huggingface: 'solidrust/fc-dolphin-2.6-mistral-7b-dpo-laser-AWQ'
+    type: Llama3
+    filename: 'Meta-Llama-3-8B-Instruct-AWQ'
+    huggingface: 'solidrust/Meta-Llama-3-8B-Instruct-AWQ'
     url: 'http://erebus.hq.solidrust.net:8081'
     agent_provider: 'tgi_server'
     server: 'Erebus'
     max_tokens: 8192
   summary:
     name: 'summary'
-    type: ChatML
-    filename: 'fc-dolphin-2.6-mistral-7b-dpo-laser-AWQ'
-    huggingface: 'solidrust/fc-dolphin-2.6-mistral-7b-dpo-laser-AWQ'
+    type: Llama3
+    filename: 'Meta-Llama-3-8B-Instruct-AWQ'
+    huggingface: 'solidrust/Meta-Llama-3-8B-Instruct-AWQ'
     url: 'http://erebus.hq.solidrust.net:8081'
     agent_provider: 'tgi_server'
     server: 'Erebus'

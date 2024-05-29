@@ -45,7 +45,7 @@ def wikipedia_response(message, history, system_message, max_tokens, temperature
     )
 
     settings = config.default_provider.get_provider_default_settings()
-    settings.stream = False
+    settings.stream = True
     settings.temperature = temperature
     settings.top_k = top_k
     settings.top_p = top_p

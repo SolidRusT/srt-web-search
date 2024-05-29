@@ -13,3 +13,4 @@ protobuf
 bs4
 streamlit
 ragatouille
+chromadb

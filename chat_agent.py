@@ -38,8 +38,6 @@ async def chat_response(message, history, system_message, max_tokens, temperatur
     elif "vllm_server" in default_agent_provider:
         settings.max_tokens = max_tokens
         settings.repetition_penalty = repetition_penalty
-    else:
-        return "unsupported llama-cpp-agent provider:", default_agent_provider
     
     messages = BasicChatHistory()
     for msn in history:

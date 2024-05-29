@@ -1,6 +1,6 @@
 import datetime
 import logging
-from config import config
+from app.config import config
 from app.messages import MessageHandler
 from llama_cpp_agent import LlamaCppAgent
 from llama_cpp_agent.chat_history import BasicChatHistory

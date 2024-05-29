@@ -1,15 +1,12 @@
 ## App defaults
+import os
 import logging
 import argparse
-import gradio as gr
-from config import config
+from app.config import config
 from app.content import css, PLACEHOLDER
 from agents.chat_agent import chat_response
 from agents.web_search_agent import web_search_response
 from llama_cpp_agent.prompt_templates import research_system_prompt
-
-# Streamlit imports
-import streamlit as st
 
 ## Log startup information
 logging.info(
@@ -26,6 +23,7 @@ logging.info(
 
 ## Gradio UI setup
 def setup_gradio_interface(response_function, system_message):
+    import gradio as gr
     return gr.ChatInterface(
         response_function,
         additional_inputs=[
@@ -81,6 +79,7 @@ def setup_gradio_interface(response_function, system_message):
     )
 
 def setup_streamlit_interface(response_function, system_message):
+    import streamlit as st
     st.title("Llama-cpp-agent Interface")
     st.write(system_message)
 
@@ -142,6 +141,6 @@ if __name__ == "__main__":
         gradio_interface = setup_gradio_interface(response_function, system_message)
         gradio_interface.launch(server_name=config.server_name, server_port=port)
     elif args.interface == "streamlit":
-        setup_streamlit_interface(response_function, system_message)
+        os.system(f"streamlit run streamlit_main.py -- --mode {args.mode}")
     elif args.interface == "custom":
         setup_custom_interface(response_function, system_message)

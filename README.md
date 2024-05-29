@@ -1,11 +1,24 @@
 # srt-web-search
 
-Web Search using llama-cpp-agent
+Web UI implementation using the `llama-cpp-agent` framework from [Maximilian-Winter/llama-cpp-agent](https://github.com/Maximilian-Winter/llama-cpp-agent).
+
+## Features
+
+- Docker image support
+- Multiple llama-cpp-agent modes:
+  - Chat Agent
+  - WebSearch Agent
+  - Wikipedia Agent (WIP)
+- Multiple web interfaces
+  - gradio
+  - streamlit (WIP)
+  - custom
 
 ## Requirements
 
 - Python 3.11
 - Python Virtualenv
+- Inference endpoint (vLLM, TGI, LamaCPPServer, LlamaCPPPython)
 
 ## Installation
 

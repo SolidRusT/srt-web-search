@@ -65,7 +65,7 @@ export LOCAL_SERVICE_PORT=8650
 export DOCKER_IMAGE="solidrust/srt-web-search:latest"
 export PERSONA=Default
 # Available modes: chat, web_search
-export MODE="web_search"
+export AGENT_MODE="web_search"
 # Available interfaces: gradio, streamlit, custom
 export INTERFACE="gradio"
 
@@ -76,5 +76,5 @@ docker run \
   --env "PERSONA=${PERSONA}" \
   -p ${LOCAL_SERVICE_PORT}:8650 \
   --ipc=host \
-  ${DOCKER_IMAGE} python3 main.py --mode ${MODE} --interface ${INTERFACE}
+  ${DOCKER_IMAGE} python3 main.py --mode ${AGENT_MODE} --interface ${INTERFACE}
 ```

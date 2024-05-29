@@ -32,7 +32,7 @@ PLACEHOLDER = """
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <div style="display: flex; flex-flow: column; justify-content: space-between;">
                 <span style="display: inline-flex; align-items: center; border-radius: 0.375rem; background-color: rgba(229, 70, 77, 0.1); padding: 0.1rem 0.75rem; font-size: 0.75rem; font-weight: 500; color: #f88181; margin-bottom: 2.5px;">
-                    SolidRust Endpoint
+                    SolidRusT Endpoint
                 </span>
             </div>
             <div style="display: flex; justify-content: flex-end; align-items: center;">

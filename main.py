@@ -46,7 +46,77 @@ logging.info(
 
 
 ## Run inference
-def respond(
+def chat_response(
+    message,
+    history: list[tuple[str, str]],
+    system_message,
+    max_tokens,
+    temperature,
+    top_p,
+    top_k,
+    repetition_penalty,
+    model,
+):
+    chat_template = MessageHandler.get_messages_formatter_type(
+        config.default_llm_type
+    )
+    model = config.default_llm_huggingface
+    system_message = f"{config.persona_system_message} {config.persona_prompt_message}"
+    
+    chat_agent = LlamaCppAgent(
+        provider=config.default_provider,  # provider, summary_provider
+        system_prompt=f"{system_message}",
+        predefined_messages_formatter_type=chat_template,  # chat_template, summary_chat_template
+        debug_output=False,
+    )
+    
+    logging.info(f"Loaded chat template: {chat_template}")
+    
+    settings = config.default_provider.get_provider_default_settings()
+    settings.stream = True
+    settings.temperature = temperature
+    settings.top_k = top_k
+    settings.top_p = top_p
+
+    if "llama_cpp_server" in default_identifier_str:
+        settings.n_predict = max_tokens
+        settings.repeat_penalty = repetition_penalty
+    elif "llama_cpp_python" in default_identifier_str:
+        settings.n_predict = max_tokens
+        settings.repeat_penalty = repetition_penalty
+    elif "tgi_server" in default_identifier_str:
+        settings.max_tokens = max_tokens
+        settings.repetition_penalty = repetition_penalty
+    elif "vllm_server" in default_identifier_str:
+        settings.max_tokens = max_tokens
+        settings.repetition_penalty = repetition_penalty
+    else:
+        return "unsupported llama-cpp-agent provider:", default_identifier_str
+    
+    
+    messages = BasicChatHistory()
+
+    for msn in history:
+        user = {"role": Roles.user, "content": msn[0]}
+        assistant = {"role": Roles.assistant, "content": msn[1]}
+        messages.add_message(user)
+        messages.add_message(assistant)
+
+    result = chat_agent.get_chat_response(
+        f"Current Date and Time(d/m/y, h:m:s): {datetime.datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}\n\nUser Query: "
+        + message,
+        llm_sampling_settings=settings,
+        add_message_to_chat_history=True,
+        add_response_to_chat_history=True,
+        print_output=False,
+    )
+
+    outputs = ""
+    for text in result:
+        outputs += text
+        yield outputs
+
+def web_search_response(
     message,
     history: list[tuple[str, str]],
     system_message,
@@ -64,7 +134,7 @@ def respond(
         config.summary_llm_type
     )
 
-    logging.info(f"Loaded chat examples: {default_chat_template}")
+    logging.info(f"Loaded chat template: {default_chat_template}")
     search_tool = WebSearchTool(
         llm_provider=config.default_provider,
         message_formatter_type=default_chat_template,
@@ -167,8 +237,72 @@ def respond(
 
 
 ## Begin Gradio UI
-main = gr.ChatInterface(
-    respond,
+gradio_chat = gr.ChatInterface(
+    chat_response,
+    additional_inputs=[
+        gr.Textbox(
+            value=f"{config.persona_system_message} {config.persona_prompt_message}",
+            label="System message",
+            interactive=True,
+        ),
+        gr.Slider(minimum=1, maximum=4096, value=2048, step=1, label="Max tokens"),
+        gr.Slider(minimum=0.1, maximum=4.0, value=0.7, step=0.1, label="Temperature"),
+        gr.Slider(
+            minimum=0.1,
+            maximum=1.0,
+            value=0.95,
+            step=0.05,
+            label="Top-p",
+        ),
+        gr.Slider(
+            minimum=0,
+            maximum=100,
+            value=40,
+            step=1,
+            label="Top-k",
+        ),
+        gr.Slider(
+            minimum=0.0,
+            maximum=2.0,
+            value=1.1,
+            step=0.1,
+            label="Repetition penalty",
+        ),
+    ],
+    # TODO: gradio theme toggle: https://github.com/SolidRusT/srt-web-search/commit/c5147aefbed1a5111ae61a8341819b28b683e10e
+    theme=gr.themes.Soft(
+        primary_hue="orange",
+        secondary_hue="amber",
+        neutral_hue="gray",
+        font=[gr.themes.GoogleFont("Exo"), "ui-sans-serif", "system-ui", "sans-serif"],
+    ).set(
+        body_background_fill_dark="#0c0505",
+        block_background_fill_dark="#0c0505",
+        block_border_width="1px",
+        block_title_background_fill_dark="#1b0f0f",
+        input_background_fill_dark="#140b0b",
+        button_secondary_background_fill_dark="#140b0b",
+        border_color_accent_dark="#1b0f0f",
+        border_color_primary_dark="#1b0f0f",
+        background_fill_secondary_dark="#0c0505",
+        color_accent_soft_dark="transparent",
+        code_background_fill_dark="#140b0b",
+    ),
+    css=css,
+    retry_btn="Retry",
+    undo_btn="Undo",
+    clear_btn="Clear",
+    submit_btn="Send",
+    examples=config.persona_topic_examples,
+    analytics_enabled=False,
+    description="Llama-cpp-agent: Chat Agent",
+    chatbot=gr.Chatbot(
+        scale=1, placeholder=PLACEHOLDER, likeable=False, show_copy_button=True
+    ),
+)
+
+gradio_search = gr.ChatInterface(
+    web_search_response,
     additional_inputs=[
         gr.Textbox(
             value=research_system_prompt,
@@ -233,4 +367,8 @@ main = gr.ChatInterface(
 
 ## Self execute when running from a CLI
 if __name__ == "__main__":
-    main.launch(server_name=config.server_name, server_port=config.server_port)
+    search_port = config.server_port
+    chat_port = config.server_port + 1
+    
+    gradio_search.launch(server_name=config.server_name, server_port=search_port)
+    #gradio_chat.launch(server_name=config.server_name, server_port=chat_port)

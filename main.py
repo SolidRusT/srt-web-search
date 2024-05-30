@@ -21,7 +21,6 @@ logging.info(
     """
 )
 
-
 ## Gradio UI setup
 def setup_gradio_interface(response_function, system_message):
     import gradio as gr

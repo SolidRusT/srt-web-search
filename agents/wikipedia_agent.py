@@ -7,11 +7,13 @@ from data.chromadb import RAGColbertReranker
 from llama_cpp_agent.text_utils import RecursiveCharacterTextSplitter
 
 async def wikipedia_response(message, history, system_message, max_tokens, temperature, top_p, top_k, repetition_penalty, model):
-    #page = get_wikipedia_page("Synthetic_diamond")
     # Synthetic_diamond  What is a BARS apparatus?
-    page = get_wikipedia_page("Ecuadorian_security_crisis")
-    # who are the Choneros?, Tell me about what is going on the Ecuadorian security crisis?, who are the criminal groups in Ecuador?
-    system_message = "You are an advanced AI assistant, trained by SolidRusT Networks."
+    title = "Synthetic_diamond"  
+    # "Ecuadorian_security_crisis"
+    #title = "Ecuadorian_security_crisis"
+        # who are the Choneros?, Tell me about what is going on the Ecuadorian security crisis?, 
+        # who are the criminal groups in Ecuador?
+    page = get_wikipedia_page(title)
     vector_store = RAGColbertReranker(persistent=False)
     length_function = len
     splitter = RecursiveCharacterTextSplitter(
@@ -29,7 +31,7 @@ async def wikipedia_response(message, history, system_message, max_tokens, tempe
     default_chat_template = MessageHandler.get_messages_formatter_type(config.default_llm_type)
     default_agent_provider = config.default_llm_agent_provider
     
-    logging.info(f"Loaded chat template: {default_chat_template}")
+    logging.info(f"Loaded chat template: {default_chat_template}, Wiki page: {page}")
 
     agent_with_rag_information = LlamaCppAgent(
         provider=config.default_provider,
@@ -81,3 +83,7 @@ async def wikipedia_response(message, history, system_message, max_tokens, tempe
     for text in response_text:
         outputs += text
         yield outputs
+    
+    outputs += "\n\Page title:\n"
+    outputs += "\n".join(title)
+    yield outputs

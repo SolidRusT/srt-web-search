@@ -1,6 +1,7 @@
 import gradio as gr
 import logging
 from app.config import config
+from web.theme_content import css, PLACEHOLDER
 
 class GradioInterface:
     def __init__(self, response_function, system_message, is_wikipedia=False):
@@ -63,7 +64,7 @@ class GradioInterface:
                 color_accent_soft_dark="transparent",
                 code_background_fill_dark="#140b0b",
             ),
-            css=config.css,
+            css=css,
             retry_btn="Retry",
             undo_btn="Undo",
             clear_btn="Clear",
@@ -72,6 +73,6 @@ class GradioInterface:
             analytics_enabled=False,
             description="Llama-cpp-agent Interface",
             chatbot=gr.Chatbot(
-                scale=1, placeholder=config.PLACEHOLDER, likeable=False, show_copy_button=True
+                scale=1, placeholder=PLACEHOLDER, likeable=False, show_copy_button=True
             ),
         )

@@ -19,17 +19,12 @@ async def wikipedia_response(
     model,
     page_title,
 ):
-    page = get_wikipedia_page(page_title)
-    # Ecuadorian_security_crisis
-    #title = "Ecuadorian_security_crisis"
-    # who are the Choneros?, Tell me about what is going on the Ecuadorian security crisis?,
-    # who are the criminal groups in Ecuador?
-    
-    # Synthetic_diamond
-    #title = "Synthetic_diamond"
-    # What is a BARS apparatus?
-    #page = get_wikipedia_page(title)
-    
+    try:
+        page = get_wikipedia_page(page_title)
+    except KeyError:
+        yield f"Could not find Wikipedia page for title: {page_title}"
+        return
+
     vector_store = RAGColbertReranker(persistent=False)
     length_function = len
     splitter = RecursiveCharacterTextSplitter(

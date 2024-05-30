@@ -8,7 +8,7 @@ from llama_cpp_agent.chat_history import BasicChatHistory
 from llama_cpp_agent.chat_history.messages import Roles
 from llama_cpp_agent.tools import WebSearchTool
 from llama_cpp_agent.llm_output_settings import LlmStructuredOutputSettings, LlmStructuredOutputType
-from llama_cpp_agent.prompt_templates import web_search_system_prompt
+from llama_cpp_agent.prompt_templates import web_search_system_prompt, research_system_prompt
 
 async def web_search_response(
     system_message,
@@ -28,24 +28,26 @@ async def web_search_response(
     
     logging.info(f"Loaded chat template: {default_chat_template}")
     search_tool = WebSearchTool(
-        llm_provider=config.default_provider,
-        message_formatter_type=default_chat_template,
-        model_max_context_tokens=config.default_llm_max_tokens,
+        # WebSearch config
         max_tokens_search_results=config.tokens_search_results,
         max_tokens_per_summary=config.tokens_per_summary,
         number_of_search_results=config.number_of_search_results,
+        # Provider config
+        llm_provider=config.summary_provider,
+        message_formatter_type=summary_chat_template,
+        model_max_context_tokens=config.summary_llm_max_tokens,
     )
 
     web_search_agent = LlamaCppAgent(
-        provider=config.summary_provider,
+        provider=config.default_provider,
         system_prompt=web_search_system_prompt,
-        predefined_messages_formatter_type=summary_chat_template,
+        predefined_messages_formatter_type=default_chat_template,
         debug_output=config.debug,
     )
 
     answer_agent = LlamaCppAgent(
         provider=config.default_provider,
-        system_prompt=system_message,
+        system_prompt=research_system_prompt,
         predefined_messages_formatter_type=default_chat_template,
         debug_output=config.debug,
     )

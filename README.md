@@ -134,6 +134,40 @@ docker run \
 
 Detailed test cases for each agent can be found in the `tests/README.md` file. Ensure to follow the steps and expected results outlined for effective testing.
 
+## Starting all agents at once
+
+```bash
+sudo apt update && sudo apt install screen
+
+python -m venv ~/venv-srt-web-search
+
+cd ~/repos/srt-web-search
+```
+
+```bash
+screen -S gradio-chat
+source ~/venv-srt-web-search/bin/activate
+pip install -U -r requirements.txt --no-cache-dir
+export PORT=8651 && export PERSONA=Veronica && python main.py --mode chat --interface gradio
+screen -d
+```
+
+```bash
+screen -S gradio-web_search
+source ~/venv-srt-web-search/bin/activate
+pip install -U -r requirements.txt --no-cache-dir
+export PORT=8652 && export PERSONA=Default && python main.py --mode web_search --interface gradio
+screen -d
+```
+
+```bash
+screen -S gradio-wikipedia
+source ~/venv-srt-web-search/bin/activate
+pip install -U -r requirements.txt --no-cache-dir
+export PORT=8653 && export PERSONA=Default && python main.py --mode wikipedia --interface gradio
+screen -d
+```
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.

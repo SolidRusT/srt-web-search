@@ -21,6 +21,7 @@ class Config:
         self.summary_llm_name = "summary"
         self.load_provider_settings()
         self.load_tools_config()
+        self.load_rag_pipeline()
         # Load persona specific settings
         self.load_persona_settings()
         # Setup logging
@@ -105,6 +106,8 @@ class Config:
                 self.default_llm_agent_provider,
                 self.summary_llm_agent_provider,
             )
+    def load_rag_pipeline(self):
+        self.embedding_model = self.config["embeddings_llm"]
 
     def load_tools_config(self):
         self.tokens_per_summary = self.config["tokens_per_summary"]

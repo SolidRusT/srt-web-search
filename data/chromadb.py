@@ -1,5 +1,6 @@
 import uuid
 import chromadb
+from app.config import config
 from chromadb.utils import embedding_functions
 from ragatouille import RAGPretrainedModel
 
@@ -12,7 +13,7 @@ class RAGColbertReranker:
     def __init__(
         self,
         persistent_db_path="./retrieval_memory",
-        embedding_model_name="BAAI/bge-small-en-v1.5",
+        embedding_model_name=config.embedding_model,
         collection_name="retrieval_memory_collection",
         persistent: bool = True,
     ):

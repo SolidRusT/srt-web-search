@@ -98,9 +98,9 @@ async def wikipedia_response(
         yield outputs
 
     page_title = ""
-    tities = f"Page title: {title}"
     page_title += "\n"
-    page_title += {tities}
+    page_title += f"Page title: {title}"
+    page_title += "\n"
 
     for text in page_title:
         outputs += text

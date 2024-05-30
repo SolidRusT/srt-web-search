@@ -55,14 +55,42 @@ deactivate
 2. Update `config.yaml` with your own parameter values.
 3. Set your CPP Agent provider and model in `config.yaml`.
 
-## Running Web Search UI
+## Running the Application
+
+### Running Web Search UI
 
 ```bash
-# Create and activate virtual environment
+# Activate virtual environment
 source ~/venv-vllm/bin/activate
 
-# Run the main script
+# Run the main script with web search mode and Gradio interface
 python main.py --mode web_search --interface gradio
+
+# Deactivate the virtual environment
+deactivate
+```
+
+### Running Chat UI
+
+```bash
+# Activate virtual environment
+source ~/venv-vllm/bin/activate
+
+# Run the main script with chat mode and Gradio interface
+python main.py --mode chat --interface gradio
+
+# Deactivate the virtual environment
+deactivate
+```
+
+### Running Wikipedia UI
+
+```bash
+# Activate virtual environment
+source ~/venv-vllm/bin/activate
+
+# Run the main script with Wikipedia mode and Gradio interface
+python main.py --mode wikipedia --interface gradio
 
 # Deactivate the virtual environment
 deactivate
@@ -101,6 +129,10 @@ docker run \
   --ipc=host \
   ${DOCKER_IMAGE} python3 main.py --mode ${AGENT_MODE} --interface ${INTERFACE}
 ```
+
+## Testing
+
+Detailed test cases for each agent can be found in the `tests/README.md` file. Ensure to follow the steps and expected results outlined for effective testing.
 
 ## Contributing
 

@@ -55,7 +55,8 @@ async def wikipedia_response(message, history, system_message, max_tokens, tempe
         settings.max_tokens = max_tokens
         settings.repetition_penalty = repetition_penalty
     else:
-        return "unsupported llama-cpp-agent provider:", default_agent_provider
+        yield "Unsupported llama-cpp-agent provider: " + default_agent_provider
+        return
 
     # Retrieve relevant document chunks based on the query
     documents = vector_store.retrieve_documents(message, k=3)

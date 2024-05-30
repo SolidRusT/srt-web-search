@@ -6,10 +6,12 @@ from agents.web_search_agent import web_search_response
 from agents.wikipedia_agent import wikipedia_response
 from llama_cpp_agent.prompt_templates import research_system_prompt
 
-def setup_streamlit_interface(response_function, system_message):
+def setup_streamlit_interface(response_function, system_message, is_wikipedia=False):
     st.title("Llama-cpp-agent Interface")
     st.write(system_message)
 
+    if is_wikipedia:
+        page_title = st.text_input("Wikipedia Page Title:", "")
     user_input = st.text_input("Your message:", "")
     max_tokens = st.slider("Max tokens", 1, 4096, 2048)
     temperature = st.slider("Temperature", 0.1, 4.0, 0.7)
@@ -28,7 +30,8 @@ def setup_streamlit_interface(response_function, system_message):
             top_p=top_p,
             top_k=top_k,
             repetition_penalty=repetition_penalty,
-            model=config.default_llm_huggingface
+            model=config.default_llm_huggingface,
+            page_title=page_title if is_wikipedia else None
         )
         for text in output:
             st.write(text)
@@ -43,6 +46,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
+    is_wikipedia = args.mode == "wikipedia"
     if args.mode == "chat":
         response_function = chat_response
         system_message = f"{config.persona_system_message} {config.persona_prompt_message}"
@@ -53,4 +57,4 @@ if __name__ == "__main__":
         response_function = wikipedia_response
         system_message = "You are an advanced AI assistant, trained by SolidRusT Networks."
 
-    setup_streamlit_interface(response_function, system_message)
+    setup_streamlit_interface(response_function, system_message, is_wikipedia)

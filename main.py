@@ -51,7 +51,7 @@ def setup_gradio_interface(response_function, system_message, is_wikipedia=False
                 yield response_text
         except Exception as e:
             logging.error(f"Error occurred during response generation: {e}")
-            yield f"An error occurred: {e}"
+            yield "An error occurred while processing your request. Please try again later."
 
     return gr.ChatInterface(
         response_fn_wrapper,
@@ -130,7 +130,7 @@ def setup_streamlit_interface(response_function, system_message, is_wikipedia=Fa
                     st.write(response_text)
             except Exception as e:
                 logging.error(f"Error occurred during response generation: {e}")
-                st.write(f"An error occurred: {e}")
+                st.write("An error occurred while processing your request. Please try again later.")
 
         asyncio.run(fetch_response())
 

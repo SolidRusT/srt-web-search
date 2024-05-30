@@ -2,14 +2,17 @@ import gradio as gr
 import logging
 from app.config import config
 from web.theme_content import css, PLACEHOLDER
+from ui_provider_base import UIProvider
 
-class GradioInterface:
+
+class GradioInterface(UIProvider):
+
     def __init__(self, response_function, system_message, is_wikipedia=False):
         self.response_function = response_function
         self.system_message = system_message
         self.is_wikipedia = is_wikipedia
 
-    def setup(self):
+    def setup_ui(self):
         try:
             logging.info("Setting up Gradio interface components.")
             if self.is_wikipedia:
@@ -25,7 +28,8 @@ class GradioInterface:
                 ]
 
             async def response_fn_wrapper(system_message, page_title=None, message=None):
-                logging.info(f"Received inputs - system_message: {system_message}, message: {message}, page_title: {page_title}")
+                logging.info(
+                    f"Received inputs - system_message: {system_message}, message: {message}, page_title: {page_title}")
                 try:
                     params = {
                         "system_message": system_message,
@@ -86,3 +90,6 @@ class GradioInterface:
         except Exception as e:
             logging.error(f"Error during Gradio setup: {e}", exc_info=True)
             raise
+
+    def start_ui_provider(self):
+        pass

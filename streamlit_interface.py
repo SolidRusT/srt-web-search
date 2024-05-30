@@ -1,14 +1,19 @@
+import os
+
 import streamlit as st
 import logging
 from app.config import config
+from ui_provider_base import UIProvider
 
-class StreamlitInterface:
+
+class StreamlitInterface(UIProvider):
+
     def __init__(self, response_function, system_message, is_wikipedia=False):
         self.response_function = response_function
         self.system_message = system_message
         self.is_wikipedia = is_wikipedia
 
-    def setup(self):
+    def setup_ui(self):
         try:
             logging.info("Setting up Streamlit interface components.")
             st.title("Llama-cpp-agent Interface")
@@ -62,3 +67,6 @@ class StreamlitInterface:
         except Exception as e:
             logging.error(f"Error in async generator handling: {e}", exc_info=True)
             yield "An error occurred while processing the response."
+
+    def start_ui_provider(self, args):
+        os.system(f"streamlit run streamlit_main.py --server.port {config.server_port} -- --mode {args.mode}")

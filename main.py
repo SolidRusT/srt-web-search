@@ -145,6 +145,6 @@ if __name__ == "__main__":
         gradio_interface = setup_gradio_interface(response_function, system_message)
         gradio_interface.launch(server_name=config.server_name, server_port=port)
     elif args.interface == "streamlit":
-        os.system(f"streamlit run streamlit_main.py -- --mode {args.mode}")
+        os.system(f"streamlit run streamlit_main.py --server.port {config.server_port} -- --mode {args.mode}")  # 
     elif args.interface == "custom":
         setup_custom_interface(response_function, system_message)

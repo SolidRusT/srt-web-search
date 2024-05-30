@@ -5,11 +5,12 @@ import logging
 
 class Config:
     def __init__(self):
-        self.debug = False
-
         # Load configuration from yaml file
         with open("config.yaml", "r") as stream:
             self.config = yaml.safe_load(stream)
+        
+        # Check for 'debugging' variable in yaml
+        self.debug = self.config.get('debug', False)
 
         # From environment variables
         self.persona_name = os.environ.get("PERSONA", "Default")

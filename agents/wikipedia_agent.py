@@ -6,10 +6,10 @@ from ragatouille.utils import get_wikipedia_page
 from llama_cpp_agent.rag.rag_colbert_reranker import RAGColbertReranker
 from llama_cpp_agent.text_utils import RecursiveCharacterTextSplitter
 
-def wikipedia_response(message, history, system_message, max_tokens, temperature, top_p, top_k, repetition_penalty, model):
+async def wikipedia_response(message, history, system_message, max_tokens, temperature, top_p, top_k, repetition_penalty, model):
     page = get_wikipedia_page("Synthetic_diamond")
     # Synthetic_diamond  What is a BARS apparatus?
-    system_message = f"You are an advanced AI assistant, trained by SolidRusT Networks."
+    system_message = "You are an advanced AI assistant, trained by SolidRusT Networks."
     vector_store = RAGColbertReranker(persistent=False)
     length_function = len
     splitter = RecursiveCharacterTextSplitter(
@@ -37,7 +37,7 @@ def wikipedia_response(message, history, system_message, max_tokens, temperature
     )
 
     settings = config.default_provider.get_provider_default_settings()
-    settings.stream = False
+    settings.stream = True
     settings.temperature = temperature
     settings.top_k = top_k
     settings.top_p = top_p
@@ -66,11 +66,15 @@ def wikipedia_response(message, history, system_message, max_tokens, temperature
     prompt += "\n======================\nQuestion: " + message
 
     # Use the agent with RAG information to generate a response
-    response_text = agent_with_rag_information.get_chat_response(prompt)
- 
-    yield response_text
-    
-    #outputs = ""
-    #for text in response_text:
-    #    outputs += text
-    #    yield outputs
+    response_text = agent_with_rag_information.get_chat_response(
+        prompt,
+        llm_sampling_settings=settings,
+        add_message_to_chat_history=True,
+        add_response_to_chat_history=True,
+        print_output=False,
+    )
+
+    outputs = ""
+    for text in response_text:
+        outputs += text
+        yield outputs

@@ -41,8 +41,15 @@ def setup_gradio_interface(response_function, system_message, is_wikipedia=False
     if is_wikipedia:
         additional_inputs.insert(0, gr.Textbox(label="Wikipedia Page Title", interactive=True))
 
+    async def response_fn_wrapper(*inputs):
+        response_gen = response_function(*inputs)
+        response_text = ""
+        async for response in response_gen:
+            response_text += response
+            yield response_text
+
     return gr.ChatInterface(
-        response_function,
+        response_fn_wrapper,
         additional_inputs=additional_inputs,
         theme=gr.themes.Soft(
             primary_hue="orange",
@@ -85,6 +92,7 @@ def setup_streamlit_interface(response_function, system_message, is_wikipedia=Fa
     st.title("Llama-cpp-agent Interface")
     st.write(system_message)
 
+    page_title = ""
     if is_wikipedia:
         page_title = st.text_input("Wikipedia Page Title:", "")
     user_input = st.text_input("Your message:", "")
@@ -108,8 +116,10 @@ def setup_streamlit_interface(response_function, system_message, is_wikipedia=Fa
             model=config.default_llm_huggingface,
             page_title=page_title if is_wikipedia else None
         )
-        for text in output:
-            st.write(text)
+        response_text = ""
+        async for response in output:
+            response_text += response
+            st.write(response_text)
 
 def setup_custom_interface(response_function, system_message):
     # Implement your custom interface logic here
@@ -149,6 +159,6 @@ if __name__ == "__main__":
         gradio_interface = setup_gradio_interface(response_function, system_message, is_wikipedia)
         gradio_interface.launch(server_name=config.server_name, server_port=port)
     elif args.interface == "streamlit":
-        os.system(f"streamlit run streamlit_main.py --server.port {config.server_port} -- --mode {args.mode}")  # 
+        os.system(f"streamlit run streamlit_main.py --server.port {config.server_port} -- --mode {args.mode}")
     elif args.interface == "custom":
         setup_custom_interface(response_function, system_message)

@@ -19,7 +19,7 @@ class GradioInterface:
             if self.is_wikipedia:
                 inputs.insert(1, gr.Textbox(label="Wikipedia Page Title", interactive=True))
 
-            async def response_fn_wrapper(system_message, message, page_title=None):
+            async def response_fn_wrapper(system_message, page_title, message):
                 try:
                     params = {
                         "system_message": system_message,
@@ -30,9 +30,8 @@ class GradioInterface:
                         "top_k": 40,
                         "repetition_penalty": 1.1,
                         "model": config.default_llm_huggingface,
+                        "page_title": page_title if self.is_wikipedia else None,
                     }
-                    if self.is_wikipedia:
-                        params["page_title"] = page_title
                     
                     response_gen = self.response_function(**params)
                     response_text = ""

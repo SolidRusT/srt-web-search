@@ -11,7 +11,14 @@ class GradioInterface:
 
     def setup(self):
         components = [
-            gr.Textbox(value=self.system_message, label="System message", interactive=True),
+            gr.Textbox(label="Your message", interactive=True),
+        ]
+        
+        if self.is_wikipedia:
+            components.append(gr.Textbox(label="Wikipedia Page Title", interactive=True))
+        
+        components += [
+            gr.Textbox(value=self.system_message, label="System message", interactive=True, visible=False),
             gr.Slider(minimum=1, maximum=4096, value=2048, step=1, label="Max tokens"),
             gr.Slider(minimum=0.1, maximum=4.0, value=0.7, step=0.1, label="Temperature"),
             gr.Slider(minimum=0.1, maximum=1.0, value=0.95, step=0.05, label="Top-p"),
@@ -24,25 +31,22 @@ class GradioInterface:
                 label="Repetition penalty",
             ),
         ]
-        
-        if self.is_wikipedia:
-            components.insert(0, gr.Textbox(label="Wikipedia Page Title", interactive=True))
 
         async def response_fn_wrapper(*args):
             try:
                 inputs = list(args)
                 params = {
                     "message": inputs.pop(0),
-                    "history": inputs.pop(0),
-                    "system_message": inputs.pop(0),
-                    "max_tokens": inputs.pop(0),
-                    "temperature": inputs.pop(0),
-                    "top_p": inputs.pop(0),
-                    "top_k": inputs.pop(0),
-                    "repetition_penalty": inputs.pop(0),
+                    "history": [],  # Empty history
+                    "system_message": inputs.pop(-6),  # System message
+                    "max_tokens": inputs.pop(-5),
+                    "temperature": inputs.pop(-4),
+                    "top_p": inputs.pop(-3),
+                    "top_k": inputs.pop(-2),
+                    "repetition_penalty": inputs.pop(-1),
                     "model": config.default_llm_huggingface,
                 }
-                
+
                 if self.is_wikipedia:
                     params["page_title"] = inputs.pop(0)
                 

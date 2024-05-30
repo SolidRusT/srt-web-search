@@ -34,7 +34,7 @@ class GradioInterface:
                     }
                     if self.is_wikipedia:
                         params["page_title"] = page_title
-                    
+
                     response_gen = self.response_function(**params)
                     response_text = ""
                     async for response in response_gen:

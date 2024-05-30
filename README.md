@@ -8,10 +8,10 @@ Web UI implementation using the `llama-cpp-agent` framework from [Maximilian-Win
 - Multiple llama-cpp-agent modes:
   - Chat Agent
   - WebSearch Agent
-  - Wikipedia Agent (WIP)
+  - Wikipedia Agent
 - Multiple web interfaces
   - gradio
-  - streamlit (WIP)
+  - streamlit
   - custom
 
 ## Requirements

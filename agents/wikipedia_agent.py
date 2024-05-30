@@ -7,8 +7,10 @@ from llama_cpp_agent.rag.rag_colbert_reranker import RAGColbertReranker
 from llama_cpp_agent.text_utils import RecursiveCharacterTextSplitter
 
 async def wikipedia_response(message, history, system_message, max_tokens, temperature, top_p, top_k, repetition_penalty, model):
-    page = get_wikipedia_page("Synthetic_diamond")
+    #page = get_wikipedia_page("Synthetic_diamond")
     # Synthetic_diamond  What is a BARS apparatus?
+    page = get_wikipedia_page("Ecuadorian_security_crisis")
+    # who are the Choneros?
     system_message = "You are an advanced AI assistant, trained by SolidRusT Networks."
     vector_store = RAGColbertReranker(persistent=False)
     length_function = len

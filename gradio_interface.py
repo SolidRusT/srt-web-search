@@ -4,7 +4,6 @@ from app.config import config
 from web.theme_content import css, PLACEHOLDER
 from ui_provider_base import UIProvider
 
-
 class GradioInterface(UIProvider):
 
     def __init__(self, response_function, system_message, is_wikipedia=False):
@@ -28,8 +27,7 @@ class GradioInterface(UIProvider):
                 ]
 
             async def response_fn_wrapper(system_message, page_title=None, message=None):
-                logging.info(
-                    f"Received inputs - system_message: {system_message}, message: {message}, page_title: {page_title}")
+                logging.info(f"Received inputs - system_message: {system_message}, message: {message}, page_title: {page_title}")
                 try:
                     params = {
                         "system_message": system_message,
@@ -91,5 +89,8 @@ class GradioInterface(UIProvider):
             logging.error(f"Error during Gradio setup: {e}", exc_info=True)
             raise
 
-    def start_ui_provider(self):
-        pass
+    def start_ui_provider(self, args):
+        try:
+            self.setup_ui().launch(server_name=config.server_name, server_port=config.server_port)
+        except Exception as e:
+            logging.error(f"Error during Gradio launch: {e}", exc_info=True)

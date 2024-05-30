@@ -1,5 +1,4 @@
 import os
-
 import streamlit as st
 import logging
 from app.config import config

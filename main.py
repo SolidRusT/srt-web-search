@@ -12,7 +12,6 @@ from streamlit_interface import StreamlitInterface
 logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(levelname)s:%(message)s')
 
 def main():
-    ui_provider = None
     parser = argparse.ArgumentParser(description="Run Llama-cpp-agent.")
     parser.add_argument("--mode", choices=["chat", "web_search", "wikipedia"], required=True, help="Mode to run the application in")
     parser.add_argument("--interface", choices=["gradio", "streamlit", "custom"], required=True, help="Interface to run the application with")
@@ -35,15 +34,17 @@ def main():
 
     if args.interface == "gradio":
         logging.info("Setting up Gradio interface.")
-        ui_provider = GradioInterface(response_function, system_message, is_wikipedia)
-
+        ui_provider = GradioInterface(response_function=response_function, system_message=system_message, is_wikipedia=is_wikipedia)
     elif args.interface == "streamlit":
         logging.info("Setting up Streamlit interface.")
-        ui_provider = StreamlitInterface(response_function, system_message, is_wikipedia)
+        ui_provider = StreamlitInterface(response_function=response_function, system_message=system_message, is_wikipedia=is_wikipedia)
     elif args.interface == "custom":
         logging.info("Custom interface is not implemented yet.")
         print("Custom interface is not implemented yet.")
+        return
+
     ui_provider.setup_ui()
     ui_provider.start_ui_provider(args)
+
 if __name__ == "__main__":
     main()

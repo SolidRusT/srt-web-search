@@ -43,11 +43,15 @@ def setup_gradio_interface(response_function, system_message, is_wikipedia=False
         additional_inputs.insert(0, gr.Textbox(label="Wikipedia Page Title", interactive=True))
 
     async def response_fn_wrapper(*inputs):
-        response_gen = response_function(*inputs, model=config.default_llm_huggingface)
-        response_text = ""
-        async for response in response_gen:
-            response_text += response
-            yield response_text
+        try:
+            response_gen = response_function(*inputs, model=config.default_llm_huggingface)
+            response_text = ""
+            async for response in response_gen:
+                response_text += response
+                yield response_text
+        except Exception as e:
+            logging.error(f"Error occurred during response generation: {e}")
+            yield f"An error occurred: {e}"
 
     return gr.ChatInterface(
         response_fn_wrapper,
@@ -108,21 +112,25 @@ def setup_streamlit_interface(response_function, system_message, is_wikipedia=Fa
         response_text = ""
 
         async def fetch_response():
-            async for response in response_function(
-                message=user_input,
-                history=history,
-                system_message=system_message,
-                max_tokens=max_tokens,
-                temperature=temperature,
-                top_p=top_p,
-                top_k=top_k,
-                repetition_penalty=repetition_penalty,
-                model=config.default_llm_huggingface,
-                page_title=page_title if is_wikipedia else None
-            ):
-                nonlocal response_text
-                response_text += response
-                st.write(response_text)
+            try:
+                async for response in response_function(
+                    message=user_input,
+                    history=history,
+                    system_message=system_message,
+                    max_tokens=max_tokens,
+                    temperature=temperature,
+                    top_p=top_p,
+                    top_k=top_k,
+                    repetition_penalty=repetition_penalty,
+                    model=config.default_llm_huggingface,
+                    page_title=page_title if is_wikipedia else None
+                ):
+                    nonlocal response_text
+                    response_text += response
+                    st.write(response_text)
+            except Exception as e:
+                logging.error(f"Error occurred during response generation: {e}")
+                st.write(f"An error occurred: {e}")
 
         asyncio.run(fetch_response())
 

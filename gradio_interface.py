@@ -31,12 +31,16 @@ class GradioInterface:
 
             async def response_fn_wrapper(*inputs):
                 try:
-                    response_gen = self.response_function(*inputs, model=config.default_llm_huggingface)
+                    if self.is_wikipedia:
+                        page_title = inputs[0]
+                        inputs = inputs[1:]
+                    else:
+                        page_title = None
+                    response_gen = self.response_function(*inputs, model=config.default_llm_huggingface, page_title=page_title)
                     response_text = ""
                     async for response in response_gen:
-                        if response.endswith((' ', '\n', '.')):
-                            response_text += response
-                            yield response_text
+                        response_text += response
+                        yield response_text
                 except Exception as e:
                     logging.error(f"Error occurred during response generation: {e}", exc_info=True)
                     yield "An error occurred while processing your request. Please try again later."

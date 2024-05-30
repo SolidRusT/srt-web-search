@@ -20,9 +20,11 @@ async def wikipedia_response(
 ):
     try:
         page = get_wikipedia_page(page_title)
-    except KeyError:
-        logging.error(f"Could not find Wikipedia page for title: {page_title}")
-        yield f"Could not find Wikipedia page for title: {page_title}"
+        if page is None:
+            raise ValueError(f"No content found for the Wikipedia page title: {page_title}")
+    except Exception as e:
+        logging.error(f"Error fetching Wikipedia page for title '{page_title}': {e}", exc_info=True)
+        yield f"Could not fetch Wikipedia page for title '{page_title}'. Error: {e}"
         return
 
     try:
@@ -45,7 +47,7 @@ async def wikipedia_response(
         )
         default_agent_provider = config.default_llm_agent_provider
 
-        logging.info(f"Loaded chat template: {default_chat_template}, Wiki page: {page}")
+        logging.info(f"Loaded chat template: {default_chat_template}, Wiki page: {page_title}")
 
         agent_with_rag_information = LlamaCppAgent(
             provider=config.default_provider,

@@ -7,16 +7,15 @@ from data.chromadb import RAGColbertReranker
 from llama_cpp_agent.text_utils import RecursiveCharacterTextSplitter
 
 async def wikipedia_response(
-    message,
-    history,
     system_message,
+    message,
     max_tokens,
     temperature,
     top_p,
     top_k,
     repetition_penalty,
     model,
-    page_title,
+    page_title=None
 ):
     try:
         page = get_wikipedia_page(page_title)
@@ -24,7 +23,7 @@ async def wikipedia_response(
             raise ValueError(f"No content found for the Wikipedia page title: {page_title}")
     except Exception as e:
         logging.error(f"Error fetching Wikipedia page for title '{page_title}': {e}", exc_info=True)
-        yield f"Could not fetch Wikipedia page for title '{page_title}'. Error: {e}"
+        yield f"Could not fetch Wikipedia page for title '{page_title}'. Please ensure the title is correct. Error: {e}"
         return
 
     try:

@@ -14,6 +14,7 @@ class GradioInterface:
             logging.info("Setting up Gradio interface components.")
             additional_inputs = [
                 gr.Textbox(value=self.system_message, label="System message", interactive=True),
+                gr.Textbox(label="Your message", interactive=True),
                 gr.Slider(minimum=1, maximum=4096, value=2048, step=1, label="Max tokens"),
                 gr.Slider(minimum=0.1, maximum=4.0, value=0.7, step=0.1, label="Temperature"),
                 gr.Slider(minimum=0.1, maximum=1.0, value=0.95, step=0.05, label="Top-p"),
@@ -27,16 +28,26 @@ class GradioInterface:
                 ),
             ]
             if self.is_wikipedia:
-                additional_inputs.insert(0, gr.Textbox(label="Wikipedia Page Title", interactive=True))
+                additional_inputs.insert(1, gr.Textbox(label="Wikipedia Page Title", interactive=True))
 
             async def response_fn_wrapper(*inputs):
                 try:
+                    params = {
+                        "system_message": inputs[0],
+                        "message": inputs[2] if self.is_wikipedia else inputs[1],
+                        "max_tokens": inputs[-5],
+                        "temperature": inputs[-4],
+                        "top_p": inputs[-3],
+                        "top_k": inputs[-2],
+                        "repetition_penalty": inputs[-1],
+                        "model": config.default_llm_huggingface,
+                    }
                     if self.is_wikipedia:
-                        page_title = inputs[0]
-                        inputs = inputs[1:]
+                        params["page_title"] = inputs[1]
                     else:
-                        page_title = None
-                    response_gen = self.response_function(*inputs, model=config.default_llm_huggingface, page_title=page_title)
+                        params["page_title"] = None
+                    
+                    response_gen = self.response_function(**params)
                     response_text = ""
                     async for response in response_gen:
                         response_text += response

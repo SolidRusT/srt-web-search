@@ -6,13 +6,24 @@ from ragatouille.utils import get_wikipedia_page
 from data.chromadb import RAGColbertReranker
 from llama_cpp_agent.text_utils import RecursiveCharacterTextSplitter
 
-async def wikipedia_response(message, history, system_message, max_tokens, temperature, top_p, top_k, repetition_penalty, model):
+
+async def wikipedia_response(
+    message,
+    history,
+    system_message,
+    max_tokens,
+    temperature,
+    top_p,
+    top_k,
+    repetition_penalty,
+    model,
+):
     # Synthetic_diamond  What is a BARS apparatus?
-    title = "Synthetic_diamond"  
+    title = "Synthetic_diamond"
     # "Ecuadorian_security_crisis"
-    #title = "Ecuadorian_security_crisis"
-        # who are the Choneros?, Tell me about what is going on the Ecuadorian security crisis?, 
-        # who are the criminal groups in Ecuador?
+    # title = "Ecuadorian_security_crisis"
+    # who are the Choneros?, Tell me about what is going on the Ecuadorian security crisis?,
+    # who are the criminal groups in Ecuador?
     page = get_wikipedia_page(title)
     vector_store = RAGColbertReranker(persistent=False)
     length_function = len
@@ -21,16 +32,18 @@ async def wikipedia_response(message, history, system_message, max_tokens, tempe
         chunk_size=512,
         chunk_overlap=0,
         length_function=length_function,
-        keep_separator=True
+        keep_separator=True,
     )
     splits = splitter.split_text(page)
-    
+
     for split in splits:
         vector_store.add_document(split)
 
-    default_chat_template = MessageHandler.get_messages_formatter_type(config.default_llm_type)
+    default_chat_template = MessageHandler.get_messages_formatter_type(
+        config.default_llm_type
+    )
     default_agent_provider = config.default_llm_agent_provider
-    
+
     logging.info(f"Loaded chat template: {default_chat_template}, Wiki page: {page}")
 
     agent_with_rag_information = LlamaCppAgent(
@@ -83,10 +96,9 @@ async def wikipedia_response(message, history, system_message, max_tokens, tempe
     for text in response_text:
         outputs += text
         yield outputs
-    
-    page_title += "\n\Page title:\n"
-    page_title += "\n".join(title)
-    
+
+    page_title += "\nPage title: \n".join(title)
+
     for text in page_title:
         outputs += text
         yield outputs

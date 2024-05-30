@@ -20,6 +20,7 @@ class GradioInterface:
                 inputs.insert(1, gr.Textbox(label="Wikipedia Page Title", interactive=True))
 
             async def response_fn_wrapper(system_message, message, page_title=None):
+                logging.info(f"Received inputs - system_message: {system_message}, message: {message}, page_title: {page_title}")
                 try:
                     params = {
                         "system_message": system_message,

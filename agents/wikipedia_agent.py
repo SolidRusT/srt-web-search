@@ -18,6 +18,7 @@ async def wikipedia_response(
     model,
     page_title=None,
 ):
+    logging.info(f"Received parameters - system_message: {system_message}, message: {message}, page_title: {page_title}")
     logging.info(f"Fetching Wikipedia page for title: {page_title}")
     try:
         page = get_wikipedia_page(page_title)

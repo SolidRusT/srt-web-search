@@ -17,8 +17,6 @@ def main():
     parser.add_argument("--interface", choices=["gradio", "streamlit", "custom"], required=True, help="Interface to run the application with")
     args = parser.parse_args()
 
-    port = config.server_port
-
     if args.mode == "chat":
         response_function = chat_response
         system_message = f"{config.persona_system_message} {config.persona_prompt_message}"

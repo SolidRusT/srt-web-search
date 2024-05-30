@@ -151,8 +151,7 @@ if __name__ == "__main__":
 
     is_wikipedia = args.mode == "wikipedia"
     if args.mode == "chat":
-        response_function = chat_response
-        system_message = f"{config.persona_system_message} {config.persona_prompt_message}"
+        response_function = chat_response(model=config.default_llm_huggingface)
     elif args.mode == "web_search":
         response_function = web_search_response
         system_message = research_system_prompt

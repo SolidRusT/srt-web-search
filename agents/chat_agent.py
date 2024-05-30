@@ -39,11 +39,12 @@ async def chat_response(message, history, system_message, max_tokens, temperatur
         settings.repetition_penalty = repetition_penalty
     
     messages = BasicChatHistory()
-    for msn in history:
-        user = {"role": Roles.user, "content": msn[0]}
-        assistant = {"role": Roles.assistant, "content": msn[1]}
-        messages.add_message(user)
-        messages.add_message(assistant)
+    if history:
+        for msn in history:
+            user = {"role": Roles.user, "content": msn[0]}
+            assistant = {"role": Roles.assistant, "content": msn[1]}
+            messages.add_message(user)
+            messages.add_message(assistant)
 
     try:
         result = chat_agent.get_chat_response(

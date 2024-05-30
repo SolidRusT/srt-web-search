@@ -18,12 +18,16 @@ async def wikipedia_response(
     repetition_penalty,
     model,
 ):
-    # Synthetic_diamond  What is a BARS apparatus?
-    title = "Synthetic_diamond"
-    # "Ecuadorian_security_crisis"
-    # title = "Ecuadorian_security_crisis"
+
+    # Ecuadorian_security_crisis
+    title = "Ecuadorian_security_crisis"
     # who are the Choneros?, Tell me about what is going on the Ecuadorian security crisis?,
     # who are the criminal groups in Ecuador?
+    
+    # Synthetic_diamond
+    #title = "Synthetic_diamond"
+    # What is a BARS apparatus?
+    
     page = get_wikipedia_page(title)
     vector_store = RAGColbertReranker(persistent=False)
     length_function = len
@@ -99,7 +103,7 @@ async def wikipedia_response(
 
     page_title = ""
     page_title += "\n"
-    page_title += f"Page title: {title}"
+    page_title += f"Page title: https://en.wikipedia.org/wiki/{title}"
     page_title += "\n"
 
     for text in page_title:

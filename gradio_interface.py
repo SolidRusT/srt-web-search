@@ -12,14 +12,19 @@ class GradioInterface:
     def setup(self):
         try:
             logging.info("Setting up Gradio interface components.")
-            inputs = [
-                gr.Textbox(value=self.system_message, label="System message", interactive=True, visible=False),
-                gr.Textbox(label="Your message", interactive=True)
-            ]
             if self.is_wikipedia:
-                inputs.insert(1, gr.Textbox(label="Wikipedia Page Title", interactive=True))
+                inputs = [
+                    gr.Textbox(value=self.system_message, label="System message", interactive=True, visible=False),
+                    gr.Textbox(label="Wikipedia Page Title", interactive=True),
+                    gr.Textbox(label="Your message", interactive=True)
+                ]
+            else:
+                inputs = [
+                    gr.Textbox(value=self.system_message, label="System message", interactive=True, visible=False),
+                    gr.Textbox(label="Your message", interactive=True)
+                ]
 
-            async def response_fn_wrapper(system_message, message, page_title=None):
+            async def response_fn_wrapper(system_message, page_title=None, message=None):
                 logging.info(f"Received inputs - system_message: {system_message}, message: {message}, page_title: {page_title}")
                 try:
                     params = {

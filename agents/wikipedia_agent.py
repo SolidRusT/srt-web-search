@@ -9,7 +9,7 @@ from llama_cpp_agent.text_utils import RecursiveCharacterTextSplitter
 async def wikipedia_response(
     system_message,
     message,
-    history,
+    history,  # Include the history parameter
     max_tokens,
     temperature,
     top_p,
@@ -18,12 +18,10 @@ async def wikipedia_response(
     model,
     page_title=None,
 ):
-    logging.info(f"Received parameters - system_message: {system_message}, message: {message}, page_title: {page_title}")
-    logging.info(f"Fetching Wikipedia page for title: {page_title}")
     try:
+        logging.info(f"Fetching Wikipedia page for title: {page_title}")
         page = get_wikipedia_page(page_title)
-        if not page:
-            raise ValueError(f"No content found for the Wikipedia page title: {page_title}")
+        logging.info(f"Fetched Wikipedia page content: {page[:500]}...")  # Log the first 500 characters of the page
     except KeyError:
         yield f"Could not fetch Wikipedia page for title '{page_title}'. Please ensure the title is correct. Error: 'query'"
         return
@@ -31,7 +29,9 @@ async def wikipedia_response(
         yield str(e)
         return
 
-    logging.info(f"Fetched Wikipedia page content: {page[:500]}...")  # Log first 500 characters of the page
+    if not page:
+        yield f"No content found for the Wikipedia page title: {page_title}"
+        return
 
     vector_store = RAGColbertReranker(persistent=False)
     length_function = len
@@ -82,14 +82,6 @@ async def wikipedia_response(
     else:
         yield "Unsupported llama-cpp-agent provider: " + default_agent_provider
         return
-
-    messages = BasicChatHistory()
-    if history:
-        for msn in history:
-            user = {"role": Roles.user, "content": msn[0]}
-            assistant = {"role": Roles.assistant, "content": msn[1]}
-            messages.add_message(user)
-            messages.add_message(assistant)
 
     # Retrieve relevant document chunks based on the query
     documents = vector_store.retrieve_documents(message, k=3)

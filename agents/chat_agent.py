@@ -6,7 +6,7 @@ from llama_cpp_agent import LlamaCppAgent
 from llama_cpp_agent.chat_history import BasicChatHistory
 from llama_cpp_agent.chat_history.messages import Roles
 
-async def chat_response(message, history, system_message, max_tokens, temperature, top_p, top_k, repetition_penalty, model):
+async def chat_response(system_message, message, history, max_tokens, temperature, top_p, top_k, repetition_penalty, model):
     system_message = f"{config.persona_system_message} {config.persona_prompt_message}"
     chat_template = MessageHandler.get_messages_formatter_type(config.default_llm_type)
 
@@ -39,16 +39,16 @@ async def chat_response(message, history, system_message, max_tokens, temperatur
         settings.repetition_penalty = repetition_penalty
     
     messages = BasicChatHistory()
-    if history:
-        for msn in history:
-            user = {"role": Roles.user, "content": msn[0]}
-            assistant = {"role": Roles.assistant, "content": msn[1]}
-            messages.add_message(user)
-            messages.add_message(assistant)
+    for msn in history:
+        user = {"role": Roles.user, "content": msn[0]}
+        assistant = {"role": Roles.assistant, "content": msn[1]}
+        messages.add_message(user)
+        messages.add_message(assistant)
 
     try:
+        query = f"Current Date and Time(d/m/y, h:m:s): {datetime.datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}\n\nUser Query: " + (message or "")
         result = chat_agent.get_chat_response(
-            f"Current Date and Time(d/m/y, h:m:s): {datetime.datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}\n\nUser Query: " + message,
+            query,
             llm_sampling_settings=settings,
             add_message_to_chat_history=True,
             add_response_to_chat_history=True,

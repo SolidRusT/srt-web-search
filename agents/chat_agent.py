@@ -57,7 +57,9 @@ async def chat_response(message, history, system_message, max_tokens, temperatur
         outputs = ""
         for text in result:
             outputs += text
-            yield outputs
+            if text.endswith((' ', '\n', '.')):
+                yield outputs
+                outputs = ""
     except Exception as e:
         logging.error(f"Error occurred during chat response generation: {e}", exc_info=True)
         yield "An error occurred while processing your request. Please try again later."

@@ -34,8 +34,9 @@ class GradioInterface:
                     response_gen = self.response_function(*inputs, model=config.default_llm_huggingface)
                     response_text = ""
                     async for response in response_gen:
-                        response_text += response
-                        yield response_text
+                        if response.endswith((' ', '\n', '.')):
+                            response_text += response
+                            yield response_text
                 except Exception as e:
                     logging.error(f"Error occurred during response generation: {e}", exc_info=True)
                     yield "An error occurred while processing your request. Please try again later."

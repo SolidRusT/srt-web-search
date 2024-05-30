@@ -7,9 +7,10 @@ from llama_cpp_agent.chat_history import BasicChatHistory
 from llama_cpp_agent.chat_history.messages import Roles
 
 async def chat_response(message, history, system_message, max_tokens, temperature, top_p, top_k, repetition_penalty, model):
-    chat_template = MessageHandler.get_messages_formatter_type(config.default_llm_type)
+    model=config.default_llm_huggingface
     system_message = f"{config.persona_system_message} {config.persona_prompt_message}"
-    
+    chat_template = MessageHandler.get_messages_formatter_type(config.default_llm_type)
+
     chat_agent = LlamaCppAgent(
         provider=config.default_provider,
         system_prompt=system_message,

@@ -1,6 +1,6 @@
 import argparse
 import streamlit as st
-from app.config import config
+from config import config
 from agents.chat_agent import chat_response
 from agents.web_search_agent import web_search_response
 from agents.wikipedia_agent import wikipedia_response
@@ -10,6 +10,7 @@ def setup_streamlit_interface(response_function, system_message, is_wikipedia=Fa
     st.title("Llama-cpp-agent Interface")
     st.write(system_message)
 
+    page_title = ""
     if is_wikipedia:
         page_title = st.text_input("Wikipedia Page Title:", "")
     user_input = st.text_input("Your message:", "")
@@ -21,20 +22,24 @@ def setup_streamlit_interface(response_function, system_message, is_wikipedia=Fa
 
     if st.button("Send"):
         history = []
-        output = response_function(
-            message=user_input,
-            history=history,
-            system_message=system_message,
-            max_tokens=max_tokens,
-            temperature=temperature,
-            top_p=top_p,
-            top_k=top_k,
-            repetition_penalty=repetition_penalty,
-            model=config.default_llm_huggingface,
-            page_title=page_title if is_wikipedia else None
-        )
-        for text in output:
-            st.write(text)
+        response_text = ""
+        async def fetch_response():
+            async for response in response_function(
+                message=user_input,
+                history=history,
+                system_message=system_message,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                top_p=top_p,
+                top_k=top_k,
+                repetition_penalty=repetition_penalty,
+                model=config.default_llm_huggingface,
+                page_title=page_title if is_wikipedia else None
+            ):
+                response_text += response
+                st.write(response_text)
+
+        st.run(fetch_response())
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run Streamlit interface for Llama-cpp-agent.")

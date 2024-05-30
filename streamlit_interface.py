@@ -45,7 +45,7 @@ class StreamlitInterface:
                 try:
                     response_gen = self.response_function(**params)
                     response_text = ""
-                    for response in response_gen:
+                    for response in self._handle_async_generator(response_gen):
                         response_text += response
                         st.write(response_text)
                 except Exception as e:
@@ -54,3 +54,11 @@ class StreamlitInterface:
         except Exception as e:
             logging.error(f"Error during Streamlit setup: {e}", exc_info=True)
             st.error("An error occurred while setting up the interface. Please check the logs for more details.")
+
+    async def _handle_async_generator(self, async_gen):
+        try:
+            async for item in async_gen:
+                yield item
+        except Exception as e:
+            logging.error(f"Error in async generator handling: {e}", exc_info=True)
+            yield "An error occurred while processing the response."

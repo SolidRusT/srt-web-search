@@ -45,15 +45,19 @@ async def chat_response(message, history, system_message, max_tokens, temperatur
         messages.add_message(user)
         messages.add_message(assistant)
 
-    result = chat_agent.get_chat_response(
-        f"Current Date and Time(d/m/y, h:m:s): {datetime.datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}\n\nUser Query: " + message,
-        llm_sampling_settings=settings,
-        add_message_to_chat_history=True,
-        add_response_to_chat_history=True,
-        print_output=False,
-    )
+    try:
+        result = chat_agent.get_chat_response(
+            f"Current Date and Time(d/m/y, h:m:s): {datetime.datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}\n\nUser Query: " + message,
+            llm_sampling_settings=settings,
+            add_message_to_chat_history=True,
+            add_response_to_chat_history=True,
+            print_output=False,
+        )
 
-    outputs = ""
-    for text in result:
-        outputs += text
-        yield outputs
+        outputs = ""
+        for text in result:
+            outputs += text
+            yield outputs
+    except Exception as e:
+        logging.error(f"Error occurred during chat response generation: {e}")
+        yield f"An error occurred: {e}"

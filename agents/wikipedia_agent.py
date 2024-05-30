@@ -84,6 +84,9 @@ async def wikipedia_response(message, history, system_message, max_tokens, tempe
         outputs += text
         yield outputs
     
-    outputs += "\n\Page title:\n"
-    outputs += "\n".join(title)
-    yield outputs
+    page_title += "\n\Page title:\n"
+    page_title += "\n".join(title)
+    
+    for text in page_title:
+        outputs += text
+        yield outputs

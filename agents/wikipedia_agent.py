@@ -17,18 +17,19 @@ async def wikipedia_response(
     top_k,
     repetition_penalty,
     model,
+    page_title,
 ):
-
+    page = get_wikipedia_page(page_title)
     # Ecuadorian_security_crisis
-    title = "Ecuadorian_security_crisis"
+    #title = "Ecuadorian_security_crisis"
     # who are the Choneros?, Tell me about what is going on the Ecuadorian security crisis?,
     # who are the criminal groups in Ecuador?
     
     # Synthetic_diamond
     #title = "Synthetic_diamond"
     # What is a BARS apparatus?
+    #page = get_wikipedia_page(title)
     
-    page = get_wikipedia_page(title)
     vector_store = RAGColbertReranker(persistent=False)
     length_function = len
     splitter = RecursiveCharacterTextSplitter(
@@ -101,11 +102,7 @@ async def wikipedia_response(
         outputs += text
         yield outputs
 
-    page_title = ""
-    page_title += "\n"
-    page_title += f"Page title: https://en.wikipedia.org/wiki/{title}"
-    page_title += "\n"
-
-    for text in page_title:
+    page_url = f"\nPage title: https://en.wikipedia.org/wiki/{page_title}\n"
+    for text in page_url:
         outputs += text
         yield outputs

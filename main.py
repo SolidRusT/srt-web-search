@@ -22,26 +22,28 @@ logging.info(
 )
 
 ## Gradio UI setup
-def setup_gradio_interface(response_function, system_message):
+def setup_gradio_interface(response_function, system_message, is_wikipedia=False):
     import gradio as gr
+    additional_inputs = [
+        gr.Textbox(value=system_message, label="System message", interactive=True),
+        gr.Slider(minimum=1, maximum=4096, value=2048, step=1, label="Max tokens"),
+        gr.Slider(minimum=0.1, maximum=4.0, value=0.7, step=0.1, label="Temperature"),
+        gr.Slider(minimum=0.1, maximum=1.0, value=0.95, step=0.05, label="Top-p"),
+        gr.Slider(minimum=0, maximum=100, value=40, step=1, label="Top-k"),
+        gr.Slider(
+            minimum=0.0,
+            maximum=2.0,
+            value=1.1,
+            step=0.1,
+            label="Repetition penalty",
+        ),
+    ]
+    if is_wikipedia:
+        additional_inputs.insert(0, gr.Textbox(label="Wikipedia Page Title", interactive=True))
+
     return gr.ChatInterface(
         response_function,
-        additional_inputs=[
-            gr.Textbox(value=system_message, label="System message", interactive=True),
-            gr.Slider(minimum=1, maximum=4096, value=2048, step=1, label="Max tokens"),
-            gr.Slider(
-                minimum=0.1, maximum=4.0, value=0.7, step=0.1, label="Temperature"
-            ),
-            gr.Slider(minimum=0.1, maximum=1.0, value=0.95, step=0.05, label="Top-p"),
-            gr.Slider(minimum=0, maximum=100, value=40, step=1, label="Top-k"),
-            gr.Slider(
-                minimum=0.0,
-                maximum=2.0,
-                value=1.1,
-                step=0.1,
-                label="Repetition penalty",
-            ),
-        ],
+        additional_inputs=additional_inputs,
         theme=gr.themes.Soft(
             primary_hue="orange",
             secondary_hue="amber",
@@ -78,11 +80,13 @@ def setup_gradio_interface(response_function, system_message):
         ),
     )
 
-def setup_streamlit_interface(response_function, system_message):
+def setup_streamlit_interface(response_function, system_message, is_wikipedia=False):
     import streamlit as st
     st.title("Llama-cpp-agent Interface")
     st.write(system_message)
 
+    if is_wikipedia:
+        page_title = st.text_input("Wikipedia Page Title:", "")
     user_input = st.text_input("Your message:", "")
     max_tokens = st.slider("Max tokens", 1, 4096, 2048)
     temperature = st.slider("Temperature", 0.1, 4.0, 0.7)
@@ -101,11 +105,11 @@ def setup_streamlit_interface(response_function, system_message):
             top_p=top_p,
             top_k=top_k,
             repetition_penalty=repetition_penalty,
-            model=config.default_llm_huggingface
+            model=config.default_llm_huggingface,
+            page_title=page_title if is_wikipedia else None
         )
         for text in output:
             st.write(text)
-
 
 def setup_custom_interface(response_function, system_message):
     # Implement your custom interface logic here
@@ -130,6 +134,7 @@ if __name__ == "__main__":
 
     port = config.server_port
 
+    is_wikipedia = args.mode == "wikipedia"
     if args.mode == "chat":
         response_function = chat_response
         system_message = f"{config.persona_system_message} {config.persona_prompt_message}"
@@ -138,10 +143,10 @@ if __name__ == "__main__":
         system_message = research_system_prompt
     elif args.mode == "wikipedia":
         response_function = wikipedia_response
-        system_message = research_system_prompt
+        system_message = "You are an advanced AI assistant, trained by SolidRusT Networks."
 
     if args.interface == "gradio":
-        gradio_interface = setup_gradio_interface(response_function, system_message)
+        gradio_interface = setup_gradio_interface(response_function, system_message, is_wikipedia)
         gradio_interface.launch(server_name=config.server_name, server_port=port)
     elif args.interface == "streamlit":
         os.system(f"streamlit run streamlit_main.py --server.port {config.server_port} -- --mode {args.mode}")  # 

@@ -8,6 +8,7 @@ from agents.chat_agent import chat_response
 from agents.web_search_agent import web_search_response
 from agents.wikipedia_agent import wikipedia_response
 from llama_cpp_agent.prompt_templates import research_system_prompt
+import asyncio
 
 ## Log startup information
 logging.info(
@@ -24,10 +25,6 @@ logging.info(
 ## Gradio UI setup
 def setup_gradio_interface(response_function, system_message, is_wikipedia=False):
     import gradio as gr
-    
-    if is_wikipedia:
-        page_title = ""
-        additional_inputs.insert(0, gr.Textbox(value=page_title, label="Wikipedia Page Title", interactive=True))
     additional_inputs = [
         gr.Textbox(value=system_message, label="System message", interactive=True),
         gr.Slider(minimum=1, maximum=4096, value=2048, step=1, label="Max tokens"),
@@ -42,6 +39,8 @@ def setup_gradio_interface(response_function, system_message, is_wikipedia=False
             label="Repetition penalty",
         ),
     ]
+    if is_wikipedia:
+        additional_inputs.insert(0, gr.Textbox(label="Wikipedia Page Title", interactive=True))
 
     async def response_fn_wrapper(*inputs):
         response_gen = response_function(*inputs, model=config.default_llm_huggingface)
@@ -91,7 +90,6 @@ def setup_gradio_interface(response_function, system_message, is_wikipedia=False
 
 def setup_streamlit_interface(response_function, system_message, is_wikipedia=False):
     import streamlit as st
-    import asyncio
     st.title("Llama-cpp-agent Interface")
     st.write(system_message)
 
@@ -160,12 +158,12 @@ if __name__ == "__main__":
         system_message = research_system_prompt
     elif args.mode == "wikipedia":
         response_function = wikipedia_response
-        system_message = research_system_prompt
+        system_message = "You are an advanced AI assistant, trained by SolidRusT Networks."
 
     if args.interface == "gradio":
-        gradio_interface = setup_gradio_interface(response_function=response_function, system_message=system_message, is_wikipedia=is_wikipedia)
+        gradio_interface = setup_gradio_interface(response_function, system_message, is_wikipedia)
         gradio_interface.launch(server_name=config.server_name, server_port=port)
     elif args.interface == "streamlit":
         os.system(f"streamlit run streamlit_main.py --server.port {config.server_port} -- --mode {args.mode}")
     elif args.interface == "custom":
-        setup_custom_interface(response_function=response_function, system_message=system_message)
+        setup_custom_interface(response_function, system_message)

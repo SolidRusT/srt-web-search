@@ -3,12 +3,12 @@ import os
 import logging
 import argparse
 from app.config import config
-from app.content import css, PLACEHOLDER
 from agents.chat_agent import chat_response
 from agents.web_search_agent import web_search_response
 from agents.wikipedia_agent import wikipedia_response
 from llama_cpp_agent.prompt_templates import research_system_prompt
-import asyncio
+from gradio_interface import GradioInterface
+from streamlit_interface import StreamlitInterface
 
 ## Log startup information
 logging.info(
@@ -21,122 +21,6 @@ logging.info(
     Loaded chat examples: {config.persona_topic_examples},
     """
 )
-
-## Gradio UI setup
-def setup_gradio_interface(response_function, system_message, is_wikipedia=False):
-    import gradio as gr
-    additional_inputs = [
-        gr.Textbox(value=system_message, label="System message", interactive=True),
-        gr.Slider(minimum=1, maximum=4096, value=2048, step=1, label="Max tokens"),
-        gr.Slider(minimum=0.1, maximum=4.0, value=0.7, step=0.1, label="Temperature"),
-        gr.Slider(minimum=0.1, maximum=1.0, value=0.95, step=0.05, label="Top-p"),
-        gr.Slider(minimum=0, maximum=100, value=40, step=1, label="Top-k"),
-        gr.Slider(
-            minimum=0.0,
-            maximum=2.0,
-            value=1.1,
-            step=0.1,
-            label="Repetition penalty",
-        ),
-    ]
-    if is_wikipedia:
-        additional_inputs.insert(0, gr.Textbox(label="Wikipedia Page Title", interactive=True))
-
-    async def response_fn_wrapper(*inputs):
-        try:
-            response_gen = response_function(*inputs, model=config.default_llm_huggingface)
-            response_text = ""
-            async for response in response_gen:
-                response_text += response
-                yield response_text
-        except Exception as e:
-            logging.error(f"Error occurred during response generation: {e}")
-            yield "An error occurred while processing your request. Please try again later."
-
-    return gr.ChatInterface(
-        response_fn_wrapper,
-        additional_inputs=additional_inputs,
-        theme=gr.themes.Soft(
-            primary_hue="orange",
-            secondary_hue="amber",
-            neutral_hue="gray",
-            font=[
-                gr.themes.GoogleFont("Exo"),
-                "ui-sans-serif",
-                "system-ui",
-                "sans-serif",
-            ],
-        ).set(
-            body_background_fill_dark="#0c0505",
-            block_background_fill_dark="#0c0505",
-            block_border_width="1px",
-            block_title_background_fill_dark="#1b0f0f",
-            input_background_fill_dark="#140b0b",
-            button_secondary_background_fill_dark="#140b0b",
-            border_color_accent_dark="#1b0f0f",
-            border_color_primary_dark="#1b0f0f",
-            background_fill_secondary_dark="#0c0505",
-            color_accent_soft_dark="transparent",
-            code_background_fill_dark="#140b0b",
-        ),
-        css=css,
-        retry_btn="Retry",
-        undo_btn="Undo",
-        clear_btn="Clear",
-        submit_btn="Send",
-        examples=config.persona_topic_examples,
-        analytics_enabled=False,
-        description="Llama-cpp-agent Interface",
-        chatbot=gr.Chatbot(
-            scale=1, placeholder=PLACEHOLDER, likeable=False, show_copy_button=True
-        ),
-    )
-
-def setup_streamlit_interface(response_function, system_message, is_wikipedia=False):
-    import streamlit as st
-    st.title("Llama-cpp-agent Interface")
-    st.write(system_message)
-
-    page_title = ""
-    if is_wikipedia:
-        page_title = st.text_input("Wikipedia Page Title:", "")
-    user_input = st.text_input("Your message:", "")
-    max_tokens = st.slider("Max tokens", 1, 4096, 2048)
-    temperature = st.slider("Temperature", 0.1, 4.0, 0.7)
-    top_p = st.slider("Top-p", 0.1, 1.0, 0.95)
-    top_k = st.slider("Top-k", 0, 100, 40)
-    repetition_penalty = st.slider("Repetition penalty", 0.0, 2.0, 1.1)
-
-    if st.button("Send"):
-        history = []
-        response_text = ""
-
-        async def fetch_response():
-            try:
-                async for response in response_function(
-                    message=user_input,
-                    history=history,
-                    system_message=system_message,
-                    max_tokens=max_tokens,
-                    temperature=temperature,
-                    top_p=top_p,
-                    top_k=top_k,
-                    repetition_penalty=repetition_penalty,
-                    model=config.default_llm_huggingface,
-                    page_title=page_title if is_wikipedia else None
-                ):
-                    nonlocal response_text
-                    response_text += response
-                    st.write(response_text)
-            except Exception as e:
-                logging.error(f"Error occurred during response generation: {e}")
-                st.write("An error occurred while processing your request. Please try again later.")
-
-        asyncio.run(fetch_response())
-
-def setup_custom_interface(response_function, system_message):
-    # Implement your custom interface logic here
-    print("Custom interface is not implemented yet.")
 
 ## Self execute when running from a CLI
 if __name__ == "__main__":
@@ -169,9 +53,12 @@ if __name__ == "__main__":
         system_message = "You are an advanced AI assistant, trained by SolidRusT Networks."
 
     if args.interface == "gradio":
-        gradio_interface = setup_gradio_interface(response_function, system_message, is_wikipedia)
-        gradio_interface.launch(server_name=config.server_name, server_port=port)
+        gradio_interface = GradioInterface(response_function, system_message, is_wikipedia)
+        interface = gradio_interface.setup()
+        interface.launch(server_name=config.server_name, server_port=port)
     elif args.interface == "streamlit":
-        os.system(f"streamlit run streamlit_main.py --server.port {config.server_port} -- --mode {args.mode}")
+        streamlit_interface = StreamlitInterface(response_function, system_message, is_wikipedia)
+        streamlit_interface.run()
     elif args.interface == "custom":
-        setup_custom_interface(response_function, system_message)
+        # Implement your custom interface logic here
+        print("Custom interface is not implemented yet.")

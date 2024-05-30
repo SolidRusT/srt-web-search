@@ -89,6 +89,7 @@ def setup_gradio_interface(response_function, system_message, is_wikipedia=False
 
 def setup_streamlit_interface(response_function, system_message, is_wikipedia=False):
     import streamlit as st
+    import asyncio
     st.title("Llama-cpp-agent Interface")
     st.write(system_message)
 
@@ -104,22 +105,26 @@ def setup_streamlit_interface(response_function, system_message, is_wikipedia=Fa
 
     if st.button("Send"):
         history = []
-        output = response_function(
-            message=user_input,
-            history=history,
-            system_message=system_message,
-            max_tokens=max_tokens,
-            temperature=temperature,
-            top_p=top_p,
-            top_k=top_k,
-            repetition_penalty=repetition_penalty,
-            model=config.default_llm_huggingface,
-            page_title=page_title if is_wikipedia else None
-        )
         response_text = ""
-        async for response in output:
-            response_text += response
-            st.write(response_text)
+
+        async def fetch_response():
+            async for response in response_function(
+                message=user_input,
+                history=history,
+                system_message=system_message,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                top_p=top_p,
+                top_k=top_k,
+                repetition_penalty=repetition_penalty,
+                model=config.default_llm_huggingface,
+                page_title=page_title if is_wikipedia else None
+            ):
+                nonlocal response_text
+                response_text += response
+                st.write(response_text)
+
+        asyncio.run(fetch_response())
 
 def setup_custom_interface(response_function, system_message):
     # Implement your custom interface logic here

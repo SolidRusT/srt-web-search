@@ -98,8 +98,7 @@ async def wikipedia_response(
         yield outputs
 
     page_title = ""
-    page_title += "\nPage title: \n"
-    page_title += "\n".join(title)
+    page_title += "\nPage title: " + {title} + "\n"
 
     for text in page_title:
         outputs += text

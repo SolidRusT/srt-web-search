@@ -5,6 +5,8 @@ from app.messages import MessageHandler
 from llama_cpp_agent import LlamaCppAgent
 from llama_cpp_agent.chat_history import BasicChatHistory
 from llama_cpp_agent.chat_history.messages import Roles
+from llama_cpp_agent.providers.llama_cpp_python import LlamaCppPythonSamplingSettings
+
 
 async def chat_response(system_message, message, history, max_tokens, temperature, top_p, top_k, repetition_penalty, model):
     system_message = f"{config.persona_system_message} {config.persona_prompt_message}"
@@ -29,10 +31,10 @@ async def chat_response(system_message, message, history, max_tokens, temperatur
         settings.n_predict = max_tokens
         settings.repeat_penalty = repetition_penalty
     elif "llama_cpp_python" in default_agent_provider:
-        settings.n_predict = max_tokens
+        settings.max_tokens = max_tokens
         settings.repeat_penalty = repetition_penalty
     elif "tgi_server" in default_agent_provider:
-        settings.max_tokens = max_tokens
+        settings.max_new_tokens = max_tokens
         settings.repetition_penalty = repetition_penalty
     elif "vllm_server" in default_agent_provider:
         settings.max_tokens = max_tokens

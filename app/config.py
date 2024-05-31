@@ -63,64 +63,55 @@ class Config:
             "max_tokens": llm_config["max_tokens"],
         }
 
+    def set_llm_attributes(self, llm_prefix, llm_settings):
+        setattr(self, f"{llm_prefix}_llm_type", llm_settings["type"])
+        setattr(self, f"{llm_prefix}_llm_filename", llm_settings["filename"])
+        setattr(self, f"{llm_prefix}_llm_huggingface", llm_settings["huggingface"])
+        setattr(self, f"{llm_prefix}_llm_url", llm_settings["url"])
+        setattr(self, f"{llm_prefix}_llm_agent_provider", llm_settings["agent_provider"])
+        setattr(self, f"{llm_prefix}_llm_server_name", llm_settings["server_name"])
+        setattr(self, f"{llm_prefix}_llm_max_tokens", llm_settings["max_tokens"])
+
     def load_provider_settings(self):
         self.default_llm_settings = self.load_llm_settings(self.default_llm_name)
         self.summary_llm_settings = self.load_llm_settings(self.summary_llm_name)
         self.chat_llm_settings = self.load_llm_settings(self.chat_llm_name)
 
-        self.default_llm_type = self.default_llm_settings["type"]
-        self.default_llm_filename = self.default_llm_settings["filename"]
-        self.default_llm_huggingface = self.default_llm_settings["huggingface"]
-        self.default_llm_url = self.default_llm_settings["url"]
-        self.default_llm_agent_provider = self.default_llm_settings["agent_provider"]
-        self.default_llm_server_name = self.default_llm_settings["server_name"]
-        self.default_llm_max_tokens = self.default_llm_settings["max_tokens"]
+        self.set_llm_attributes('default', self.default_llm_settings)
+        self.set_llm_attributes('summary', self.summary_llm_settings)
+        self.set_llm_attributes('chat', self.chat_llm_settings)
 
-        # Provider specific settings
-        if "llama_cpp_server" in self.default_llm_agent_provider:
+        # Provider specific settings for default LLM
+        if "llama_cpp_server" in self.default_llm_settings["agent_provider"]:
             from llama_cpp_agent.providers import LlamaCppServerProvider
-
-            self.default_provider = LlamaCppServerProvider(self.default_llm_url)
-
-        elif "llama_cpp_python" in self.default_llm_agent_provider:
+            self.default_provider = LlamaCppServerProvider(self.default_llm_settings["url"])
+        elif "llama_cpp_python" in self.default_llm_settings["agent_provider"]:
             from llama_cpp import Llama
             from llama_cpp_agent.providers import LlamaCppPythonProvider
-
-            # TODO: add HF download logic here
-            # hf download {huggingface} {filename}
             python_cpp_llm = Llama(
-                model_path=f"models/{self.default_llm_filename}",
+                model_path=f"models/{self.default_llm_settings['filename']}",
                 flash_attn=True,
                 n_threads=40,
                 n_gpu_layers=81,
                 n_batch=1024,
-                n_ctx=self.default_llm_max_tokens,
+                n_ctx=self.default_llm_settings["max_tokens"],
             )
             self.default_provider = LlamaCppPythonProvider(python_cpp_llm)
-
-        elif "tgi_server" in self.default_llm_agent_provider:
+        elif "tgi_server" in self.default_llm_settings["agent_provider"]:
             from llama_cpp_agent.providers import TGIServerProvider
-
-            self.default_provider = TGIServerProvider(
-                server_address=self.default_llm_url,
-                # api_key
-            )
-
-        elif "vllm_server" in self.default_llm_agent_provider:
+            self.default_provider = TGIServerProvider(server_address=self.default_llm_settings["url"])
+        elif "vllm_server" in self.default_llm_settings["agent_provider"]:
             from llama_cpp_agent.providers import VLLMServerProvider
-
             self.default_provider = VLLMServerProvider(
-                base_url=self.default_llm_url,
-                model=self.default_llm_huggingface,
-                huggingface_model=self.default_llm_huggingface,
-                # api_key
+                base_url=self.default_llm_settings["url"],
+                model=self.default_llm_settings["huggingface"],
+                huggingface_model=self.default_llm_settings["huggingface"],
             )
-
         else:
             self.default_provider = "unsupported"
             return (
                 "unsupported llama-cpp-agent provider:",
-                self.default_llm_agent_provider,
+                self.default_llm_settings["agent_provider"],
             )
 
     def load_rag_pipeline(self):

@@ -8,24 +8,18 @@ tokens_per_summary: 4096
 tokens_search_results: 8192
 number_of_search_results: 3
 embeddings_llm: "BAAI/bge-small-en-v1.5"
+default_llm: mistral
+summary_llm: mistral
+chat_llm: mistral
 llms:
-  default:
-    name: 'default'
+  mistral:
+    name: 'mistral'
     type: Mistral
     filename: 'Mistral-7B-instruct-v0.3-AWQ'
     huggingface: 'solidrust/Mistral-7B-instruct-v0.3-AWQ'
     url: 'http://thanatos.hq.solidrust.net:8082/v1'
     agent_provider: 'vllm_server'
     server: 'Thanatos'
-    max_tokens: 25000
-  summary:
-    name: 'summary'
-    type: Mistral
-    filename: 'Mistral-7B-instruct-v0.3-AWQ'
-    huggingface: 'solidrust/Mistral-7B-instruct-v0.3-AWQ'
-    url: 'http://zelus.hq.solidrust.net:8083/v1'
-    agent_provider: 'vllm_server'
-    server: 'Zelus'
     max_tokens: 25000
 personas:
   # Assistants (gradio)

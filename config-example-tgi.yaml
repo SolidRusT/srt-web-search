@@ -8,18 +8,12 @@ tokens_per_summary: 4096
 tokens_search_results: 8192
 number_of_search_results: 3
 embeddings_llm: "BAAI/bge-small-en-v1.5"
+default_llm: llama3
+summary_llm: llama3
+chat_llm: llama3
 llms:
-  default:
-    name: 'default'
-    type: Llama3
-    filename: 'Meta-Llama-3-8B-Instruct-AWQ'
-    huggingface: 'solidrust/Meta-Llama-3-8B-Instruct-AWQ'
-    url: 'http://erebus.hq.solidrust.net:8081'
-    agent_provider: 'tgi_server'
-    server: 'Erebus'
-    max_tokens: 8192
-  summary:
-    name: 'summary'
+  llama3:
+    name: 'llama3'
     type: Llama3
     filename: 'Meta-Llama-3-8B-Instruct-AWQ'
     huggingface: 'solidrust/Meta-Llama-3-8B-Instruct-AWQ'

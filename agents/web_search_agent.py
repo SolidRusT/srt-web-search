@@ -9,6 +9,7 @@ from llama_cpp_agent.chat_history.messages import Roles
 from llama_cpp_agent.tools import WebSearchTool
 from llama_cpp_agent.llm_output_settings import LlmStructuredOutputSettings, LlmStructuredOutputType
 from llama_cpp_agent.prompt_templates import web_search_system_prompt, research_system_prompt
+from llama_cpp_agent.providers.llama_cpp_python import LlamaCppPythonSamplingSettings
 
 async def web_search_response(
     system_message,
@@ -62,10 +63,10 @@ async def web_search_response(
         settings.n_predict = max_tokens
         settings.repeat_penalty = repetition_penalty
     elif "llama_cpp_python" in default_agent_provider:
-        settings.n_predict = max_tokens
+        settings.max_tokens = max_tokens
         settings.repeat_penalty = repetition_penalty
     elif "tgi_server" in default_agent_provider:
-        settings.max_tokens = max_tokens
+        settings.max_new_tokens = max_tokens
         settings.repetition_penalty = repetition_penalty
     elif "vllm_server" in default_agent_provider:
         settings.max_tokens = max_tokens

@@ -2,6 +2,7 @@ import os
 import yaml
 import logging
 
+
 class Config:
     def __init__(self):
         # Load configuration from yaml file
@@ -17,20 +18,38 @@ class Config:
         self.server_name = os.environ.get("SERVER_NAME", "0.0.0.0")
 
         # Load provider configuration
-        self.default_llm_name = (self.config["llms"]["default_llm"], "default")
-        self.summary_llm_name = (self.config["llms"]["summary_llm"], "default")
-        self.chat_llm_name = (self.config["llms"]["chat_llm"], "default")
+        self.default_llm_name = self.get_first_existing_value(
+            ["llm_default", "llms.default"], "default"
+        )
+        self.summary_llm_name = self.get_first_existing_value(
+            ["llm_summary", "llms.summary"], "summary"
+        )
+        self.chat_llm_name = self.get_first_existing_value(
+            ["llm_chat", "llms.chat"], "default"
+        )
         self.load_provider_settings()
 
         # Load Agent Tools
         self.load_tools_config()
         self.load_rag_pipeline()
-        
+
         # Load persona specific settings
         self.load_persona_settings()
-        
+
         # Setup logging
         self.setup_logging()
+
+    def get_first_existing_value(self, keys, default_value):
+        for key in keys:
+            parts = key.split(".")
+            value = self.config
+            try:
+                for part in parts:
+                    value = value[part]
+                return value
+            except KeyError:
+                continue
+        return default_value
 
     def load_llm_settings(self, llm_name):
         llm_config = self.config["llms"][llm_name]
@@ -41,7 +60,7 @@ class Config:
             "url": llm_config["url"],
             "agent_provider": llm_config["agent_provider"],
             "server_name": llm_config["server"],
-            "max_tokens": llm_config["max_tokens"]
+            "max_tokens": llm_config["max_tokens"],
         }
 
     def load_provider_settings(self):
@@ -49,20 +68,28 @@ class Config:
         self.summary_llm_settings = self.load_llm_settings(self.summary_llm_name)
         self.chat_llm_settings = self.load_llm_settings(self.chat_llm_name)
 
+        self.default_llm_type = self.default_llm_settings["type"]
+        self.default_llm_filename = self.default_llm_settings["filename"]
+        self.default_llm_huggingface = self.default_llm_settings["huggingface"]
+        self.default_llm_url = self.default_llm_settings["url"]
+        self.default_llm_agent_provider = self.default_llm_settings["agent_provider"]
+        self.default_llm_server_name = self.default_llm_settings["server_name"]
+        self.default_llm_max_tokens = self.default_llm_settings["max_tokens"]
+
         # Provider specific settings
-        if "llama_cpp_server" in self.summary_llm_agent_provider:
+        if "llama_cpp_server" in self.default_llm_agent_provider:
             from llama_cpp_agent.providers import LlamaCppServerProvider
 
             self.default_provider = LlamaCppServerProvider(self.default_llm_url)
-            self.summary_provider = LlamaCppServerProvider(self.summary_llm_url)
-        elif "llama_cpp_python" in self.summary_llm_agent_provider:
+
+        elif "llama_cpp_python" in self.default_llm_agent_provider:
             from llama_cpp import Llama
             from llama_cpp_agent.providers import LlamaCppPythonProvider
 
             # TODO: add HF download logic here
             # hf download {huggingface} {filename}
             python_cpp_llm = Llama(
-                model_path=f"models/{self.summary_llm_filename}",
+                model_path=f"models/{self.default_llm_filename}",
                 flash_attn=True,
                 n_threads=40,
                 n_gpu_layers=81,
@@ -70,22 +97,16 @@ class Config:
                 n_ctx=self.default_llm_max_tokens,
             )
             self.default_provider = LlamaCppPythonProvider(python_cpp_llm)
-            self.summary_provider = LlamaCppPythonProvider(python_cpp_llm)
-        elif "tgi_server" in self.summary_llm_agent_provider:
-            from llama_cpp_agent.providers import TGIServerProvider
 
-            self.default_provider = TGIServerProvider(self.default_llm_url)
-            self.summary_provider = TGIServerProvider(self.summary_llm_url)
+        elif "tgi_server" in self.default_llm_agent_provider:
+            from llama_cpp_agent.providers import TGIServerProvider
 
             self.default_provider = TGIServerProvider(
                 server_address=self.default_llm_url,
                 # api_key
             )
-            self.summary_provider = TGIServerProvider(
-                server_address=self.default_llm_url,
-                # api_key
-            )
-        elif "vllm_server" in self.summary_llm_agent_provider:
+
+        elif "vllm_server" in self.default_llm_agent_provider:
             from llama_cpp_agent.providers import VLLMServerProvider
 
             self.default_provider = VLLMServerProvider(
@@ -94,22 +115,19 @@ class Config:
                 huggingface_model=self.default_llm_huggingface,
                 # api_key
             )
-            self.summary_provider = VLLMServerProvider(
-                base_url=self.summary_llm_url,
-                model=self.summary_llm_huggingface,
-                huggingface_model=self.summary_llm_huggingface,
-                # api_key
-            )
+
         else:
             self.default_provider = "unsupported"
-            self.summary_provider = "unsupported"
             return (
                 "unsupported llama-cpp-agent provider:",
                 self.default_llm_agent_provider,
-                self.summary_llm_agent_provider,
             )
+
     def load_rag_pipeline(self):
-        self.embedding_model = self.config["embeddings_llm"]
+        self.embeddings_llm = self.get_first_existing_value(
+            ["llm_embeddings", "llms.embeddings"], "BAAI/bge-small-en-v1.5"
+        )
+        self.embedding_model = self.config["llm_embeddings"]
 
     def load_tools_config(self):
         self.tokens_per_summary = self.config["tokens_per_summary"]

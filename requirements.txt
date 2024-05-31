@@ -1,4 +1,4 @@
-llama_cpp_agent>=0.2.20
+llama_cpp_agent>=0.2.23
 scikit-build-core
 gradio>=4.31.5
 openai

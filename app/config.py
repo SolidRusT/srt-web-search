@@ -85,6 +85,8 @@ class Config:
         if "llama_cpp_server" in self.default_llm_settings["agent_provider"]:
             from llama_cpp_agent.providers import LlamaCppServerProvider
             self.default_provider = LlamaCppServerProvider(self.default_llm_settings["url"])
+            self.default_summary = LlamaCppServerProvider(self.summary_llm_settings["url"])
+            self.default_chat = LlamaCppServerProvider(self.chat_llm_settings["url"])
         elif "llama_cpp_python" in self.default_llm_settings["agent_provider"]:
             from llama_cpp import Llama
             from llama_cpp_agent.providers import LlamaCppPythonProvider
@@ -97,9 +99,13 @@ class Config:
                 n_ctx=self.default_llm_settings["max_tokens"],
             )
             self.default_provider = LlamaCppPythonProvider(python_cpp_llm)
+            self.summary_provider = LlamaCppPythonProvider(python_cpp_llm)
+            self.chat_provider = LlamaCppPythonProvider(python_cpp_llm)
         elif "tgi_server" in self.default_llm_settings["agent_provider"]:
             from llama_cpp_agent.providers import TGIServerProvider
             self.default_provider = TGIServerProvider(server_address=self.default_llm_settings["url"])
+            self.summary_provider = TGIServerProvider(server_address=self.summary_llm_settings["url"])
+            self.chat_provider = TGIServerProvider(server_address=self.chat_llm_settings["url"])
         elif "vllm_server" in self.default_llm_settings["agent_provider"]:
             from llama_cpp_agent.providers import VLLMServerProvider
             self.default_provider = VLLMServerProvider(
@@ -107,11 +113,22 @@ class Config:
                 model=self.default_llm_settings["huggingface"],
                 huggingface_model=self.default_llm_settings["huggingface"],
             )
+            self.summary_provider = VLLMServerProvider(
+                base_url=self.summary_llm_settings["url"],
+                model=self.summary_llm_settings["huggingface"],
+                huggingface_model=self.summary_llm_settings["huggingface"],
+            )
+            self.chat_provider = VLLMServerProvider(
+                base_url=self.chat_llm_settings["url"],
+                model=self.chat_llm_settings["huggingface"],
+                huggingface_model=self.chat_llm_settings["huggingface"],
+            )
         else:
-            self.default_provider = "unsupported"
             return (
                 "unsupported llama-cpp-agent provider:",
                 self.default_llm_settings["agent_provider"],
+                self.summary_llm_settings["agent_provider"],
+                self.chat_llm_settings["agent_provider"],
             )
 
     def load_rag_pipeline(self):

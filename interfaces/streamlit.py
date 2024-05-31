@@ -2,7 +2,7 @@ import os
 import streamlit as st
 import logging
 from app.config import config
-from ui_provider_base import UIProvider
+from interfaces import UIProvider
 
 
 class StreamlitInterface(UIProvider):

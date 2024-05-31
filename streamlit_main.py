@@ -1,6 +1,6 @@
 import argparse
 import logging
-from streamlit_interface import StreamlitInterface
+from interfaces.streamlit import StreamlitInterface
 from agents.chat_agent import chat_response
 from agents.web_search_agent import web_search_response
 from agents.wikipedia_agent import wikipedia_response

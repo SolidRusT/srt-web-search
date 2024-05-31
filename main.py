@@ -5,8 +5,8 @@ from app.config import config
 from agents.chat_agent import chat_response
 from agents.web_search_agent import web_search_response
 from agents.wikipedia_agent import wikipedia_response
-from gradio_interface import GradioInterface
-from streamlit_interface import StreamlitInterface
+from interfaces.gradio import GradioInterface
+from interfaces.streamlit import StreamlitInterface
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(levelname)s:%(message)s')

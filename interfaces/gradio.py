@@ -2,7 +2,7 @@ import gradio as gr
 import logging
 from app.config import config
 from web.theme_content import css, PLACEHOLDER
-from ui_provider_base import UIProvider
+from interfaces import UIProvider
 
 class GradioInterface(UIProvider):
 

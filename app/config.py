@@ -17,35 +17,37 @@ class Config:
         self.server_name = os.environ.get("SERVER_NAME", "0.0.0.0")
 
         # Load provider configuration
-        self.default_llm_name = "default"
-        self.summary_llm_name = "summary"
+        self.default_llm_name = (self.config["llms"]["default_llm"], "default")
+        self.summary_llm_name = (self.config["llms"]["summary_llm"], "default")
+        self.chat_llm_name = (self.config["llms"]["chat_llm"], "default")
         self.load_provider_settings()
+
+        # Load Agent Tools
         self.load_tools_config()
         self.load_rag_pipeline()
+        
         # Load persona specific settings
         self.load_persona_settings()
+        
         # Setup logging
         self.setup_logging()
 
+    def load_llm_settings(self, llm_name):
+        llm_config = self.config["llms"][llm_name]
+        return {
+            "type": llm_config["type"],
+            "filename": llm_config["filename"],
+            "huggingface": llm_config["huggingface"],
+            "url": llm_config["url"],
+            "agent_provider": llm_config["agent_provider"],
+            "server_name": llm_config["server"],
+            "max_tokens": llm_config["max_tokens"]
+        }
+
     def load_provider_settings(self):
-        # Load default LLM from yaml config
-        default_llm = self.config["llms"][self.default_llm_name]
-        self.default_llm_type = default_llm["type"]
-        self.default_llm_filename = default_llm["filename"]
-        self.default_llm_huggingface = default_llm["huggingface"]
-        self.default_llm_url = default_llm["url"]
-        self.default_llm_agent_provider = default_llm["agent_provider"]
-        self.default_llm_server_name = default_llm["server"]
-        self.default_llm_max_tokens = default_llm["max_tokens"]
-        # Load summary LLM from yaml config
-        summary_llm = self.config["llms"][self.summary_llm_name]
-        self.summary_llm_type = summary_llm["type"]
-        self.summary_llm_filename = summary_llm["filename"]
-        self.summary_llm_huggingface = summary_llm["huggingface"]
-        self.summary_llm_url = summary_llm["url"]
-        self.summary_llm_agent_provider = summary_llm["agent_provider"]
-        self.summary_llm_server_name = summary_llm["server"]
-        self.summary_llm_max_tokens = summary_llm["max_tokens"]
+        self.default_llm_settings = self.load_llm_settings(self.default_llm_name)
+        self.summary_llm_settings = self.load_llm_settings(self.summary_llm_name)
+        self.chat_llm_settings = self.load_llm_settings(self.chat_llm_name)
 
         # Provider specific settings
         if "llama_cpp_server" in self.summary_llm_agent_provider:

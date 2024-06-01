@@ -2,9 +2,9 @@ import os
 import logging
 import argparse
 from app.config import config
-from agents.chat_agent import chat_response
-from agents.web_search_agent import web_search_response
-from agents.wikipedia_agent import wikipedia_response
+from agents.chat import chat_response
+from agents.web_search import web_search_response
+from agents.wikipedia import wikipedia_response
 from interfaces.gradio import GradioInterface
 from interfaces.streamlit import StreamlitInterface
 from interfaces.cli import CLIInterface

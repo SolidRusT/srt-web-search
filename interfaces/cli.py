@@ -1,4 +1,5 @@
 import asyncio
+import re
 from app.config import config
 
 class CLIInterface:
@@ -23,29 +24,49 @@ class CLIInterface:
 
                 # Handling input for Wikipedia mode
                 if self.is_wikipedia:
-                    inputs = user_input.split('\n')
+                    inputs = user_input.split('\n', 1)
                     page_title = inputs[0]
                     query = inputs[1] if len(inputs) > 1 else ""
+                    
+                    # Construct the necessary arguments as a dictionary for Wikipedia mode
+                    response_args = {
+                        "system_message": self.system_message,
+                        "message": query,
+                        "history": [],  # Assuming empty history for simplicity
+                        "max_tokens": 100,  # Adjust as needed
+                        "temperature": 0.7,  # Adjust as needed
+                        "top_p": 0.9,  # Adjust as needed
+                        "top_k": 50,  # Adjust as needed
+                        "repetition_penalty": 1.0,  # Adjust as needed
+                        "model": config.default_llm_name,  # Assuming default model
+                        "page_title": page_title
+                    }
                 else:
-                    page_title = None
-                    query = user_input
+                    # Construct the necessary arguments as a dictionary for non-Wikipedia modes
+                    response_args = {
+                        "system_message": self.system_message,
+                        "message": user_input,
+                        "history": [],  # Assuming empty history for simplicity
+                        "max_tokens": 100,  # Adjust as needed
+                        "temperature": 0.7,  # Adjust as needed
+                        "top_p": 0.9,  # Adjust as needed
+                        "top_k": 50,  # Adjust as needed
+                        "repetition_penalty": 1.0,  # Adjust as needed
+                        "model": config.default_llm_name  # Assuming default model
+                    }
 
-                # Construct the necessary arguments as a dictionary
-                response_args = {
-                    "system_message": self.system_message,
-                    "message": query,
-                    "history": [],  # Assuming empty history for simplicity
-                    "max_tokens": 100,  # Adjust as needed
-                    "temperature": 0.7,  # Adjust as needed
-                    "top_p": 0.9,  # Adjust as needed
-                    "top_k": 50,  # Adjust as needed
-                    "repetition_penalty": 1.0,  # Adjust as needed
-                    "model": config.default_llm_name,  # Assuming default model
-                    "page_title": page_title  # Adding page_title for Wikipedia mode
-                }
-
+                # Accumulate the streaming output
+                buffer = ""
                 async for response in self.response_function(**response_args):
-                    print(f"AI: {response}")
+                    buffer += response
+                    print(f"Debug: Current response segment: '{response}'")  # Debug print
+                    # Print when a complete sentence or significant chunk is formed
+                    if re.search(r"[.!?]\s", buffer):
+                        print(f"AI: {buffer.strip()}")
+                        buffer = ""
+                # Print any remaining text that didn't end with a complete sentence
+                if buffer:
+                    print(f"AI: {buffer.strip()}")
             except Exception as e:
                 print(f"Error: {e}")
                 break

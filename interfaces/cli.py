@@ -22,51 +22,48 @@ class CLIInterface:
                     print("Exiting CLI Interface.")
                     break
 
-                # Handling input for Wikipedia mode
                 if self.is_wikipedia:
                     inputs = user_input.split('\n', 1)
                     page_title = inputs[0]
                     query = inputs[1] if len(inputs) > 1 else ""
                     
-                    # Construct the necessary arguments as a dictionary for Wikipedia mode
                     response_args = {
                         "system_message": self.system_message,
                         "message": query,
-                        "history": [],  # Assuming empty history for simplicity
-                        "max_tokens": 100,  # Adjust as needed
-                        "temperature": 0.7,  # Adjust as needed
-                        "top_p": 0.9,  # Adjust as needed
-                        "top_k": 50,  # Adjust as needed
-                        "repetition_penalty": 1.0,  # Adjust as needed
-                        "model": config.default_llm_name,  # Assuming default model
+                        "history": [],
+                        "max_tokens": 2048,
+                        "temperature": 0.7,
+                        "top_p": 0.95,
+                        "top_k": 40,
+                        "repetition_penalty": 1.1,
+                        "model": config.default_llm_huggingface,
                         "page_title": page_title
                     }
                 else:
-                    # Construct the necessary arguments as a dictionary for non-Wikipedia modes
                     response_args = {
                         "system_message": self.system_message,
                         "message": user_input,
-                        "history": [],  # Assuming empty history for simplicity
-                        "max_tokens": 100,  # Adjust as needed
-                        "temperature": 0.7,  # Adjust as needed
-                        "top_p": 0.9,  # Adjust as needed
-                        "top_k": 50,  # Adjust as needed
-                        "repetition_penalty": 1.0,  # Adjust as needed
-                        "model": config.default_llm_name  # Assuming default model
+                        "history": [],
+                        "max_tokens": 2048,
+                        "temperature": 0.7,
+                        "top_p": 0.95,
+                        "top_k": 40,
+                        "repetition_penalty": 1.1,
+                        "model": config.default_llm_huggingface
                     }
 
-                # Accumulate the streaming output
-                buffer = ""
+                full_response = ""
                 async for response in self.response_function(**response_args):
-                    buffer += response
-                    print(f"Debug: Current response segment: '{response}'")  # Debug print
-                    # Print when a complete sentence or significant chunk is formed
-                    if re.search(r"[.!?]\s", buffer):
-                        print(f"AI: {buffer.strip()}")
-                        buffer = ""
-                # Print any remaining text that didn't end with a complete sentence
-                if buffer:
-                    print(f"AI: {buffer.strip()}")
+                    full_response += response
+                    # Only print complete sentences or significant chunks
+                    if re.search(r"[.!?]\s|\n", full_response):
+                        print(f"AI: {full_response.strip()}")
+                        full_response = ""
+                    await asyncio.sleep(0.1)  # Short delay to allow streaming
+
+                if full_response:
+                    print(f"AI: {full_response.strip()}")
+
             except Exception as e:
                 print(f"Error: {e}")
                 break

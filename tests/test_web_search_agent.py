@@ -1,7 +1,6 @@
 import pytest
 import subprocess
 
-
 def test_simple_web_search():
     result = subprocess.run(
         ["python", "main.py", "--mode", "web_search", "--interface", "cli"],
@@ -9,8 +8,7 @@ def test_simple_web_search():
         text=True,
         capture_output=True,
     )
-    assert "Paris" in result.stdout
-
+    assert "AI: Paris" in result.stdout
 
 def test_research_document_generation():
     result = subprocess.run(
@@ -19,4 +17,4 @@ def test_research_document_generation():
         text=True,
         capture_output=True,
     )
-    assert "detailed research document on the impact of climate change" in result.stdout
+    assert "AI: Detailed report on the impact of climate change" in result.stdout

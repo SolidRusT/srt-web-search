@@ -1,7 +1,6 @@
 import pytest
 import subprocess
 
-
 def test_basic_interaction():
     result = subprocess.run(
         ["python", "main.py", "--mode", "chat", "--interface", "cli"],
@@ -9,8 +8,7 @@ def test_basic_interaction():
         text=True,
         capture_output=True,
     )
-    assert "friendly greeting" in result.stdout
-
+    assert "AI: I am an artificial intelligence" in result.stdout
 
 def test_complex_query():
     result = subprocess.run(
@@ -19,4 +17,4 @@ def test_complex_query():
         text=True,
         capture_output=True,
     )
-    assert "detailed explanation of the theory of relativity" in result.stdout
+    assert "AI: The Theory of Relativity, proposed by Albert Einstein" in result.stdout

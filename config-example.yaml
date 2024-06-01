@@ -14,7 +14,7 @@ summary_llm: llama3
 chat_llm: mistral
 llms:
   mistral:
-    name: 'mistral'
+    name: 'Instruct Mistral 7B'
     type: Mistral
     filename: 'Mistral-7B-instruct-v0.3-AWQ'
     huggingface: 'solidrust/Mistral-7B-instruct-v0.3-AWQ'
@@ -23,7 +23,7 @@ llms:
     server: 'Thanatos'
     max_tokens: 25000
   llama3:
-    name: 'llama3'
+    name: 'Instruct Lama-3 8B'
     type: Llama3
     filename: 'Meta-Llama-3-8B-Instruct-AWQ'
     huggingface: 'solidrust/Meta-Llama-3-8B-Instruct-AWQ'
@@ -31,6 +31,15 @@ llms:
     agent_provider: 'tgi_server'
     server: 'Erebus'
     max_tokens: 8192
+  chatml:
+    name: 'Mahou Mistral 7B'
+    type: ChatML
+    filename: 'Mahou-1.3-mistral-7B-AWQ'
+    huggingface: 'solidrust/Mahou-1.3-mistral-7B-AWQ'
+    url: 'http://zelus.hq.solidrust.net:8081'
+    agent_provider: 'vllm_server'
+    server: 'Zelus'
+    max_tokens: 25000
 personas:
   # Assistants (gradio)
   Default:

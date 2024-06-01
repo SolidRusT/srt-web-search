@@ -5,12 +5,11 @@ from llama_cpp_agent import LlamaCppAgent
 from ragatouille.utils import get_wikipedia_page
 from data.chromadb import RAGColbertReranker
 from llama_cpp_agent.text_utils import RecursiveCharacterTextSplitter
-from llama_cpp_agent.providers.llama_cpp_python import LlamaCppPythonSamplingSettings
 
 async def wikipedia_response(
     system_message,
     message,
-    history,  # Include the history parameter
+    history,
     max_tokens,
     temperature,
     top_p,
@@ -84,15 +83,14 @@ async def wikipedia_response(
         yield "Unsupported llama-cpp-agent provider: " + default_agent_provider
         return
 
-    # Retrieve relevant document chunks based on the query
     documents = vector_store.retrieve_documents(message, k=3)
+    logging.info(f"Retrieved documents: {documents}")
 
     prompt = "Consider the following context:\n==========Context===========\n"
     for doc in documents:
         prompt += doc["content"] + "\n\n"
     prompt += "\n======================\nQuestion: " + message
 
-    # Use the agent with RAG information to generate a response
     response_text = agent_with_rag_information.get_chat_response(
         prompt,
         llm_sampling_settings=settings,

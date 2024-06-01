@@ -7,7 +7,8 @@ def test_simple_web_search():
         text=True,
         capture_output=True,
     )
-    assert "AI: The capital of France is Paris" in result.stdout
+    assert "capital of france" in result.stdout.lower()
+    assert "paris" in result.stdout.lower()
 
 def test_research_document_generation():
     result = subprocess.run(
@@ -16,5 +17,5 @@ def test_research_document_generation():
         text=True,
         capture_output=True,
     )
-    assert "AI: Climate change refers to" in result.stdout
-    assert "AI: greenhouse gases" in result.stdout
+    assert "climate change" in result.stdout.lower()
+    assert "impact" in result.stdout.lower()

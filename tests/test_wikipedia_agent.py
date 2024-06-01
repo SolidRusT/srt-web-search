@@ -1,4 +1,3 @@
-import pytest
 import subprocess
 
 def test_list_of_nobel_laureates():
@@ -8,15 +7,7 @@ def test_list_of_nobel_laureates():
         text=True,
         capture_output=True,
     )
-    assert "AI: Fetched and processed Wikipedia page for title 'List_of_Nobel_laureates'" in result.stdout
-
-    result = subprocess.run(
-        ["python", "main.py", "--mode", "wikipedia", "--interface", "cli"],
-        input="List_of_Nobel_laureates\nWhat were the prizes given to the winners?\nexit\n",
-        text=True,
-        capture_output=True,
-    )
-    assert "AI: Fetched and processed Wikipedia page for title 'List_of_Nobel_laureates'" in result.stdout
+    assert "AI: Nobel laureates from 1999 include" in result.stdout
 
 def test_synthetic_diamond():
     result = subprocess.run(
@@ -25,7 +16,7 @@ def test_synthetic_diamond():
         text=True,
         capture_output=True,
     )
-    assert "AI: Fetched and processed Wikipedia page for title 'Synthetic_diamond'" in result.stdout
+    assert "AI: A BARS apparatus is" in result.stdout
 
 def test_ecuadorian_security_crisis():
     result = subprocess.run(
@@ -34,20 +25,6 @@ def test_ecuadorian_security_crisis():
         text=True,
         capture_output=True,
     )
-    assert "AI: Fetched and processed Wikipedia page for title 'Ecuadorian_security_crisis'" in result.stdout
-
-    result = subprocess.run(
-        ["python", "main.py", "--mode", "wikipedia", "--interface", "cli"],
-        input="Ecuadorian_security_crisis\nWho are the criminal groups in Ecuador?\nexit\n",
-        text=True,
-        capture_output=True,
-    )
-    assert "AI: Fetched and processed Wikipedia page for title 'Ecuadorian_security_crisis'" in result.stdout
-
-    result = subprocess.run(
-        ["python", "main.py", "--mode", "wikipedia", "--interface", "cli"],
-        input="Ecuadorian_security_crisis\nWho are Choneros?\nexit\n",
-        text=True,
-        capture_output=True,
-    )
-    assert "AI: Fetched and processed Wikipedia page for title 'Ecuadorian_security_crisis'" in result.stdout
+    assert "AI: The Ecuadorian security crisis" in result.stdout
+    assert "AI: criminal groups in Ecuador" in result.stdout
+    assert "AI: Choneros" in result.stdout

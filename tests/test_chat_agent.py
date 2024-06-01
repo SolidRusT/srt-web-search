@@ -1,4 +1,3 @@
-import pytest
 import subprocess
 
 def test_basic_interaction():
@@ -8,7 +7,8 @@ def test_basic_interaction():
         text=True,
         capture_output=True,
     )
-    assert "AI: I am an artificial intelligence" in result.stdout
+    assert "AI: Hello" in result.stdout
+    assert "AI: How are you?" in result.stdout
 
 def test_complex_query():
     result = subprocess.run(
@@ -17,4 +17,5 @@ def test_complex_query():
         text=True,
         capture_output=True,
     )
-    assert "AI: The Theory of Relativity, proposed by Albert Einstein" in result.stdout
+    assert "AI: The theory of relativity" in result.stdout
+    assert "AI: proposed by Albert Einstein" in result.stdout

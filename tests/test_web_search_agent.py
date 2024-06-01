@@ -1,4 +1,3 @@
-import pytest
 import subprocess
 
 def test_simple_web_search():
@@ -8,7 +7,7 @@ def test_simple_web_search():
         text=True,
         capture_output=True,
     )
-    assert "AI: Paris" in result.stdout
+    assert "AI: The capital of France is Paris" in result.stdout
 
 def test_research_document_generation():
     result = subprocess.run(
@@ -17,4 +16,5 @@ def test_research_document_generation():
         text=True,
         capture_output=True,
     )
-    assert "AI: Detailed report on the impact of climate change" in result.stdout
+    assert "AI: Climate change refers to" in result.stdout
+    assert "AI: greenhouse gases" in result.stdout
